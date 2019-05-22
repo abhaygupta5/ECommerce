@@ -1,0 +1,33 @@
+“Business Objective :
+1. Create a sub-section of a e-commerce website. The sites lists products that are available to be sold.
+2. Each product can be sold by multiple merchants. For example, merchant “”EasyBuy”" wants to sell 5 pieces of “”IPhone 6s Gold 32GB”" at 35,300 INR each and merchant “”Telesoft”" wants to sell 8 pieces of “”IPhone 6s Gold 32GB”" at 36,100 INR each.
+3. Each product has a USP, description, attributes, price, stock (presume the data already exists in the system)
+4. Products can be searched in the website based on the name of the product. The search result also indicates how many merchants sell the same product (based on example given in #2)
+5. Clicking on each product in the list takes the user to the product details page.
+6. If multiple merchants sell the same product, the order of showing the merchants should be based on an algorithm computed with weighted average of the following
+       - Number of products the merchant offers to sell
+       - Number of products sold (number of orders created)
+       - Current stock of the product
+       - Merchant rating
+       - Price of the products by various merchants
+       - Customer reviews/rating given to the products of various merchants
+7. On the product details page the user can select the merchant from whom he/she wants to buy the product and add the product to cart.
+8. Product added to the cart can be checked out by clicking the “”"“Buy Now”“”" button. The checkout takes an email to which a success email is sent.
+9. History of all orders placed for one email address should be listed in one section of the website.
+
+Technical Objective :
+1. The entire project should follow micro-service driven architecture.
+2. Products, Merchant, Order/Cart, Search would be 4 micro-services each dealing with its respective business entities, CRUD operations.
+3. Follow MVC/Singleton design patterns wherever applicable.
+4. All source code to be maintained in GIT. Commits to be made at frequent intervals (atleast 3 times every day - by every developer)
+5. Coding conventions/guidelines should be STRICTLY followedStretch
+Stretch>> 6. Unit testing sections of code that can be tested
+7. UI and backend validations in all possible workflows.
+8. At least 1 DB should be used which was not taught in training.
+9. Same backend APIs should be used for both Web UI and Android application
+
+Reference :
+a. https://www.blibli.com/jual/iphone-6s?s=iphone+6s+
+b. https://www.blibli.com/apple-iphone-6s-16-gb-smartphone-silver-garansi-internasional-MTA.0261938.htm
+c. http://www.amazon.in/s/ref=nb_sb_noss_2?url=search-alias%3Daps&field-keywords=iphone+6s+32gb+gold&sprefix=iphone+%2Celectronics%2CNaN
+d. http://www.amazon.in/gp/offer-listing/B01M0CJNVL”
