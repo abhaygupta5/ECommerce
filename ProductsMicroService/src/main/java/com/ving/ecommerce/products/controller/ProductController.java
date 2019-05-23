@@ -52,6 +52,11 @@ public class ProductController {
         return productService.getFilters(category, subcategory);
     }
 
+    @PostMapping(value = "/createFilters", produces = "application/json")
+    ResponseObject createFilters(@RequestBody FilterDTO filterDTO){
+        return productService.createFilters(filterDTO);
+    }
+
     @GetMapping("/productReviews/{productId}")
     ResponseObject getListOfProductReview(@PathVariable int productId){
         return productService.getListOfProductReview(productId);

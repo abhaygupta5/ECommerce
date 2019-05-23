@@ -1,9 +1,11 @@
 package com.ving.ecommerce.products.model;
 
+import java.util.HashMap;
+
 public class FilterDTO {
     private String category;
     private String subCategory;
-    private Object filters;
+    private HashMap<String, Object> filters;
 
     public String getCategory() {
         return category;
@@ -21,11 +23,11 @@ public class FilterDTO {
         this.subCategory = subCategory;
     }
 
-    public Object getFilters() {
+    public HashMap<String, Object> getFilters() {
         return filters;
     }
 
-    public void setFilters(Object filters) {
+    public void setFilters(HashMap<String, Object> filters) {
         this.filters = filters;
     }
 

@@ -3,27 +3,37 @@ package com.ving.ecommerce.products.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "ProductReview")
 public class ProductReview {
     @Id
-    private ProductReviewId productReviewIdId;
+    private int productId;
+    private int userId;
     private String userName;
     private int rating;
     private String reviewBody;
 
-    public ProductReview(ProductReviewId productReviewIdId, String userName, int rating, String reviewBody) {
-        this.productReviewIdId = productReviewIdId;
+    public ProductReview(int productId, int userId, String userName, int rating, String reviewBody) {
+        this.productId = productId;
+        this.userId = userId;
         this.userName = userName;
         this.rating = rating;
         this.reviewBody = reviewBody;
     }
 
-    public ProductReviewId getProductReviewIdId() {
-        return productReviewIdId;
+    public int getProductId() {
+        return productId;
     }
 
-    public void setProductReviewIdId(ProductReviewId productReviewIdId) {
-        this.productReviewIdId = productReviewIdId;
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {

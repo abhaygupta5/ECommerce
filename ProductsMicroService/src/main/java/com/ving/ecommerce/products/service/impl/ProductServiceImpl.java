@@ -3,7 +3,6 @@ package com.ving.ecommerce.products.service.impl;
 import com.ving.ecommerce.products.entity.Filter;
 import com.ving.ecommerce.products.entity.Product;
 import com.ving.ecommerce.products.entity.ProductReview;
-import com.ving.ecommerce.products.entity.ProductReviewId;
 import com.ving.ecommerce.products.model.FilterDTO;
 import com.ving.ecommerce.products.model.ProductDTO;
 import com.ving.ecommerce.products.model.ResponseObject;
@@ -11,13 +10,8 @@ import com.ving.ecommerce.products.repository.FilterRepository;
 import com.ving.ecommerce.products.repository.ProductRepository;
 import com.ving.ecommerce.products.repository.ProductReviewRepository;
 import com.ving.ecommerce.products.service.ProductService;
-import org.json.JSONObject;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompare;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,16 +26,35 @@ public class ProductServiceImpl implements ProductService {
     String BASE_EMAIL_SERVICE = "http://localhost:8084";
     String BASE_SEARCH_SERVICE = "http://localhost:8085";
 
-    @Autowired
-    private FilterRepository filterRepository;
+
     @Autowired
     private ProductRepository productRepository;
     @Autowired
     private ProductReviewRepository productReviewRepository;
+    @Autowired
+    private FilterRepository filterRepository;
 
     @Override
     public ResponseObject getTopProducts() {
-        return null;
+        long total = productRepository.count();
+        ArrayList<Integer> numbers = new ArrayList<>();
+        //Generates 10 Random Numbers in the range 1 - total
+        if(total>10) {
+            for (int i = 0; i < 10; ) {
+                int number = (int) (Math.random() * total + 1);
+                if (numbers.contains(number)) {
+                    continue;
+                }
+                numbers.add(number);
+                i++;
+            }
+            List<Product> products = new ArrayList<>();
+            for(int productId : numbers){
+                products.add(productRepository.findOne(productId));
+            }
+            return new ResponseObject(products, true);
+        }
+        return getAllProducts();
     }
 
     @Override
@@ -67,24 +80,14 @@ public class ProductServiceImpl implements ProductService {
         Filter filter = new Filter();
         BeanUtils.copyProperties(filterDTO, filter);
         List<Product> products = productRepository.findByCategoryAndSubCategory(filter.getCategory(), filter.getSubCategory());
-        JSONObject filters = new JSONObject(filterDTO.getFilters());
+        Map<String,Object> filters = filterDTO.getFilters();
         ArrayList<Product> filteredProducts = new ArrayList<>();
         for(Product product : products){
-            int flag=0;
-            JSONObject productJson = new JSONObject(product.getAttributes());
-            Iterator iterator = productJson.keys();
-
-            while(iterator.hasNext()){
-                String key = iterator.next().toString();
-                if (filters.get(key) != productJson.get(key)){
-                    flag=1;
-                    break;
-                }
-            }
-            if(flag == 0){
+            Map<String,Object> attributes = product.getAttributes();
+            if (attributes.entrySet().containsAll(filters.entrySet())) {
+                // filters is subset of attributes
                 filteredProducts.add(product);
             }
-
         }
         if(filteredProducts.size() != 0){
             ArrayList<ProductDTO> productDTOS = new ArrayList<>();
@@ -129,7 +132,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseObject getFilters(String category, String subcategory) {
         if(filterRepository.findByCategoryAndSubCategory(category,subcategory) !=null){
-            return new ResponseObject(filterRepository.findByCategoryAndSubCategory(category, subcategory), true);
+            Filter filter = filterRepository.findByCategoryAndSubCategory(category, subcategory);
+            return new ResponseObject(filter.getFilters(), true);
         }
         return new ResponseObject(null, false);
     }
@@ -152,7 +156,7 @@ public class ProductServiceImpl implements ProductService {
         responseObject = restTemplate.getForObject(uri, ResponseObject.class);
         Map<String,String> data = (HashMap<String,String>)responseObject.getData();
         String username = data.get("userDisplayName");
-        ProductReview productReview = productReviewRepository.save(new ProductReview(new ProductReviewId(productId,userId),username,rating, review));
+        ProductReview productReview = productReviewRepository.save(new ProductReview(productId,userId,username,rating, review));
         if(productReview !=null){
             return new ResponseObject(true,true);
         }
@@ -165,8 +169,8 @@ public class ProductServiceImpl implements ProductService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
         int userId = (int)responseObject.getData();
-        if(productReviewRepository.exists(new ProductReviewId(productId, userId))){
-            productReviewRepository.delete(new ProductReviewId(productId, userId));
+        if(productReviewRepository.findByProductIdAndUserId(productId, userId) !=null){
+            productReviewRepository.delete(productReviewRepository.findByProductIdAndUserId(productId, userId));
             return new ResponseObject(true, true);
         }
         return new ResponseObject(null, false);
@@ -200,7 +204,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseObject updateProduct(ProductDTO productDTO) {
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
-        if(!productRepository.exists(productDTO.getProductId())){
+        if(productRepository.exists(productDTO.getProductId())){
             return new ResponseObject(productRepository.save(product),true);
         }
         return new ResponseObject(null, false);
@@ -212,6 +216,17 @@ public class ProductServiceImpl implements ProductService {
         if(product !=null){
             productRepository.delete(productId);
             return new ResponseObject(true,true);
+        }
+        return new ResponseObject(null, false);
+    }
+
+    @Override
+    public ResponseObject createFilters(FilterDTO filterDTO) {
+        Filter filter = new Filter();
+        BeanUtils.copyProperties(filterDTO, filter);
+        Filter result = filterRepository.save(filter);
+        if(result != null){
+            return new ResponseObject(result, true);
         }
         return new ResponseObject(null, false);
     }

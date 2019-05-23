@@ -15,6 +15,7 @@ public interface ProductService {
     ResponseObject getProduct(int productId);
     ResponseObject getAllProducts();
     ResponseObject getFilters(String category, String subcategory);
+    ResponseObject createFilters(FilterDTO filterDTO);
     ResponseObject getListOfProductReview(int productId);
     ResponseObject setProductReview(int productId, String token, String review, int rating);
     ResponseObject deleteProductReview(String token, int productId);

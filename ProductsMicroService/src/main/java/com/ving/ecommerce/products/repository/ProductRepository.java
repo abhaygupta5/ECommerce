@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository
 public interface ProductRepository extends MongoRepository<Product,Integer> {
     List<Product> findByCategory(String category);
     List<Product> findByCategoryAndSubCategory(String category, String subCategory);

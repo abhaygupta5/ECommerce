@@ -8,18 +8,20 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-@Document
+@Document(collection = "Product")
 public class Product {
     @Id
     private int productId;
     private String category;
     private String subCategory;
-    private Object productImages;
+    private List<String> productImages;
     private String productName;
     private String brand;
     private double price;
-    private Object attributes;
+    private Map<String, Object> attributes;
 
     public int getProductId() {
         return productId;
@@ -45,15 +47,11 @@ public class Product {
         this.subCategory = subCategory;
     }
 
-    public Object getProductImages() {
+    public List<String> getProductImages() {
         return productImages;
     }
 
-    public void setProductImages(String productImages) {
-        this.productImages = productImages;
-    }
-
-    public void setProductImages(ArrayList<String> productImages) {
+    public void setProductImages(List<String> productImages) {
         this.productImages = productImages;
     }
 
@@ -81,22 +79,11 @@ public class Product {
         this.price = price;
     }
 
-    public Object getAttributes() {
+    public Map<String, Object> getAttributes() {
         return attributes;
     }
 
-    // data field can be a string
-    public void setAttributes(String attributes) {
+    public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
-    }
-    // data field can be a {}
-    public void setAttributes(JSONObject attributes) {
-        this.attributes = new BasicDBObject(attributes.toMap());
-    }
-    // data can be a []
-    public void setAttributes(JSONArray attributes) {
-        BasicDBList list = new BasicDBList();
-        list.addAll(attributes.toList());
-        this.attributes = list;
     }
 }

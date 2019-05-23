@@ -1,19 +1,35 @@
 package com.ving.ecommerce.products.model;
 
-import com.ving.ecommerce.products.entity.ProductReviewId;
 
 public class ProductReviewDTO {
-    private ProductReviewId productReviewIdId;
+    private int productId;
+    private int userId;
     private String userName;
     private int rating;
     private String reviewBody;
 
-    public ProductReviewId getProductReviewIdId() {
-        return productReviewIdId;
+    public ProductReviewDTO(int productId, int userId, String userName, int rating, String reviewBody) {
+        this.productId = productId;
+        this.userId = userId;
+        this.userName = userName;
+        this.rating = rating;
+        this.reviewBody = reviewBody;
     }
 
-    public void setProductReviewIdId(ProductReviewId productReviewIdId) {
-        this.productReviewIdId = productReviewIdId;
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {
@@ -43,7 +59,8 @@ public class ProductReviewDTO {
     @Override
     public String toString() {
         return "ProductReviewDTO{" +
-                "productReviewIdId=" + productReviewIdId +
+                "productId=" + productId +
+                ", userId=" + userId +
                 ", userName='" + userName + '\'' +
                 ", rating=" + rating +
                 ", reviewBody='" + reviewBody + '\'' +
