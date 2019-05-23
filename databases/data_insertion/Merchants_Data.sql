@@ -16,106 +16,108 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `Merchant`
+-- Table structure for table `merchant`
 --
 
-DROP TABLE IF EXISTS `Merchant`;
+DROP TABLE IF EXISTS `merchant`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Merchant` (
-  `merchantId` int(11) NOT NULL,
-  `merchantName` varchar(100) DEFAULT NULL,
-  `merchantAddress` varchar(100) NOT NULL,
-  `merchantEmail` varchar(100) DEFAULT NULL,
-  `merchantPhone` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`merchantId`),
-  UNIQUE KEY `merchantName` (`merchantName`),
-  UNIQUE KEY `merchantEmail` (`merchantEmail`),
-  UNIQUE KEY `merchantPhone` (`merchantPhone`)
+CREATE TABLE `merchant` (
+  `merchant_id` int(11) NOT NULL,
+  `merchant_address` varchar(255) DEFAULT NULL,
+  `merchant_email` varchar(255) DEFAULT NULL,
+  `merchant_name` varchar(255) DEFAULT NULL,
+  `merchant_phone` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`merchant_id`),
+  UNIQUE KEY `UK_8mxk85y1tp1d7s1a5gh3om7ks` (`merchant_email`),
+  UNIQUE KEY `UK_9d99mmka6ug1kl85hatmdji3m` (`merchant_name`),
+  UNIQUE KEY `UK_jqxp0bcuqmk0ec1lr6t0q3ouj` (`merchant_phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Merchant`
+-- Dumping data for table `merchant`
 --
 
-LOCK TABLES `Merchant` WRITE;
-/*!40000 ALTER TABLE `Merchant` DISABLE KEYS */;
-INSERT INTO `Merchant` VALUES (1,'SuperComNet','H.No. 123, 13th cross road, bangalore, karnataka','anmol.gupta@coviam.com',9234325678),(2,'RohanCom','H.No. 54, 17th cross road, bangalore, karnataka','rohan.sharma@coviam.com',9298756708),(3,'Ablish Ltd','H.No. 1588, 11th cross road, bangalore, karnataka','abhilash.gupta@coviam.com',9298098508);
-/*!40000 ALTER TABLE `Merchant` ENABLE KEYS */;
+LOCK TABLES `merchant` WRITE;
+INSERT INTO `merchant`(`merchant_id`,`merchant_name`,`merchant_address`,`merchant_email`, `merchant_phone`) VALUES (1,'SuperComNet','H.No. 123, 13th cross road, bangalore, karnataka','anmol.gupta@coviam.com',9234325678),(2,'RohanCom','H.No. 54, 17th cross road, bangalore, karnataka','rohan.sharma@coviam.com',9298756708),(3,'Ablish Ltd','H.No. 1588, 11th cross road, bangalore, karnataka','abhilash.gupta@coviam.com',9298098508);
+
+/*!40000 ALTER TABLE `merchant` DISABLE KEYS */;
+/*!40000 ALTER TABLE `merchant` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `MerchantRating`
+-- Table structure for table `merchant_rating`
 --
 
-DROP TABLE IF EXISTS `MerchantRating`;
+DROP TABLE IF EXISTS `merchant_rating`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `MerchantRating` (
-  `merchantId` int(11) NOT NULL,
-  `userId` int(11) NOT NULL,
+CREATE TABLE `merchant_rating` (
+  `merchant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `rating` int(11) NOT NULL,
-  PRIMARY KEY (`merchantId`,`userId`)
+  PRIMARY KEY (`merchant_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `MerchantRating`
+-- Dumping data for table `merchant_rating`
 --
 
-LOCK TABLES `MerchantRating` WRITE;
-/*!40000 ALTER TABLE `MerchantRating` DISABLE KEYS */;
-INSERT INTO `MerchantRating` VALUES (1,1,4),(1,2,3),(1,3,5),(2,1,5),(2,2,2),(3,2,4);
-/*!40000 ALTER TABLE `MerchantRating` ENABLE KEYS */;
+LOCK TABLES `merchant_rating` WRITE;
+INSERT INTO `merchant_rating` VALUES (1,1,4),(1,2,3),(1,3,5),(2,1,5),(2,2,2),(3,2,4);
+
+/*!40000 ALTER TABLE `merchant_rating` DISABLE KEYS */;
+/*!40000 ALTER TABLE `merchant_rating` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `ProductMerchant`
+-- Table structure for table `product_merchant`
 --
 
-DROP TABLE IF EXISTS `ProductMerchant`;
+DROP TABLE IF EXISTS `product_merchant`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ProductMerchant` (
-  `merchantId` int(11) NOT NULL,
-  `productId` int(11) NOT NULL,
-  `stock` int(11) NOT NULL DEFAULT '0',
-  `productPrice` double NOT NULL,
-  PRIMARY KEY (`merchantId`,`productId`)
+CREATE TABLE `product_merchant` (
+  `merchant_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `product_price` double NOT NULL,
+  `stock` int(11) NOT NULL,
+  PRIMARY KEY (`merchant_id`,`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ProductMerchant`
+-- Dumping data for table `product_merchant`
 --
 
-LOCK TABLES `ProductMerchant` WRITE;
-/*!40000 ALTER TABLE `ProductMerchant` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ProductMerchant` ENABLE KEYS */;
+LOCK TABLES `product_merchant` WRITE;
+/*!40000 ALTER TABLE `product_merchant` DISABLE KEYS */;
+/*!40000 ALTER TABLE `product_merchant` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `TopMerchants`
+-- Table structure for table `top_merchants`
 --
 
-DROP TABLE IF EXISTS `TopMerchants`;
+DROP TABLE IF EXISTS `top_merchants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `TopMerchants` (
-  `productId` int(11) NOT NULL,
-  `merchantList` text,
-  PRIMARY KEY (`productId`)
+CREATE TABLE `top_merchants` (
+  `product_id` int(11) NOT NULL,
+  `merchant_list` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `TopMerchants`
+-- Dumping data for table `top_merchants`
 --
 
-LOCK TABLES `TopMerchants` WRITE;
-/*!40000 ALTER TABLE `TopMerchants` DISABLE KEYS */;
-/*!40000 ALTER TABLE `TopMerchants` ENABLE KEYS */;
+LOCK TABLES `top_merchants` WRITE;
+/*!40000 ALTER TABLE `top_merchants` DISABLE KEYS */;
+/*!40000 ALTER TABLE `top_merchants` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -127,4 +129,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-23  0:04:57
+-- Dump completed on 2019-05-23 12:52:32
