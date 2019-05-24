@@ -4,6 +4,9 @@ public class ResponseObject {
     private Object data;
     private boolean ok;
 
+    public ResponseObject() {
+    }
+
     public ResponseObject(Object data, boolean ok) {
         this.data = data;
         this.ok = ok;
@@ -17,7 +20,7 @@ public class ResponseObject {
         this.data = data;
     }
 
-    public boolean isOk() {
+    public boolean getOk() {
         return ok;
     }
 
@@ -28,7 +31,7 @@ public class ResponseObject {
     @Override
     public String toString() {
         return "ResponseObject{" +
-                ", data=" + data +
+                "data=" + data +
                 ", ok=" + ok +
                 '}';
     }

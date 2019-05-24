@@ -9,6 +9,7 @@ import com.ving.ecommerce.orders.service.CartService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +17,28 @@ import java.util.List;
 @Service
 public class CartServiceImpl implements CartService {
 
+    String BASE_PRODUCT_SERVICE = "http://localhost:8080";
+    String BASE_MERCHANT_SERVICE = "http://localhost:8081";
+    String BASE_ORDER_SERVICE = "http://localhost:8082";
+    String BASE_USER_SERVICE = "http://localhost:8083";
+    String BASE_EMAIL_SERVICE = "http://localhost:8084";
+    String BASE_SEARCH_SERVICE = "http://localhost:8085";
+
     @Autowired
     private UserCartRepository userCartRepository;
 
     public ResponseObject addProductToCart(String token, int productId, int merchantId, int qty) {
 
         // get userid from token using the userservice
+        ResponseObject responseObject = getUserIdFromToken(token);
 
-        //testing
-        // add userid directly for now
-        // TODO Get userid from token
-        // TODO handle userId not found
-        int userId = 1;
+        int userId;
+        // check if token is valid
+        if(responseObject.getOk() == false) {
+            return new ResponseObject("invalid token", false);
+        } else {
+            userId = (int)responseObject.getData();
+        }
 
         // check if cart exists for the user
         if(userCartRepository.exists(userId)) {
@@ -89,12 +100,15 @@ public class CartServiceImpl implements CartService {
     public ResponseObject deleteCartItem(String token, int productId, int merchantId) {
 
         // get userid from token using the userservice
+        ResponseObject responseObject = getUserIdFromToken(token);
 
-        //testing
-        // add userid directly for now
-        // TODO Get userid from token
-        // TODO handle userId not found
-        int userId = 1;
+        int userId;
+        // check if token is valid
+        if(responseObject.getOk() == false) {
+            return new ResponseObject("invalid token", false);
+        } else {
+            userId = (int)responseObject.getData();
+        }
 
         // check if cart exists for the user
         if(userCartRepository.exists(userId)) {
@@ -139,12 +153,15 @@ public class CartServiceImpl implements CartService {
     @Override
     public ResponseObject getUserCart(String token) {
         // get userid from token using the userservice
+        ResponseObject responseObject = getUserIdFromToken(token);
 
-        //testing
-        // add userid directly for now
-        // TODO Get userid from token
-        // TODO handle userId not found
-        int userId = 1;
+        int userId;
+        // check if token is valid
+        if(responseObject.getOk() == false) {
+            return new ResponseObject("invalid token", false);
+        } else {
+            userId = (int)responseObject.getData();
+        }
 
         if(userCartRepository.exists(userId)) {
             // get user cart
@@ -157,5 +174,14 @@ public class CartServiceImpl implements CartService {
         } else {
             return new ResponseObject(null, true);
         }
+    }
+
+    // helper function
+    private ResponseObject getUserIdFromToken(String token) {
+        String uri = BASE_USER_SERVICE+"/users/"+token;
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
+
+        return responseObject;
     }
 }

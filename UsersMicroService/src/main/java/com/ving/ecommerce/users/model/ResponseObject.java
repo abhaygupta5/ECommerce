@@ -28,7 +28,7 @@ public class ResponseObject {
     @Override
     public String toString() {
         return "ResponseObject{" +
-                ", data=" + data +
+                "data=" + data +
                 ", ok=" + ok +
                 '}';
     }

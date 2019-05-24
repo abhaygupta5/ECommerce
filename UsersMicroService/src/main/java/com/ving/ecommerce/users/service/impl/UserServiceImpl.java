@@ -9,9 +9,6 @@ import com.ving.ecommerce.users.utilities.HashGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,7 +172,7 @@ public class UserServiceImpl implements UserService {
         UserToken userToken = userTokenRepository.findByToken(token);
 
         if(userToken != null) {
-            return new ResponseObject(userToken.getToken(), true);
+            return new ResponseObject(userToken.getUserId(), true);
         } else {
             return new ResponseObject("token not found in database", false);
         }
@@ -191,7 +188,6 @@ public class UserServiceImpl implements UserService {
             return new ResponseObject(false, true);
         }
     }
-
 
     // Helper functions
     public boolean existsUserName(String userName) {
