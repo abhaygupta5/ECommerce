@@ -1,5 +1,6 @@
 package com.ving.ecommerce.orders.service.impl;
 
+import com.ving.ecommerce.orders.ServerConfiguration;
 import com.ving.ecommerce.orders.entity.CartItem;
 import com.ving.ecommerce.orders.entity.ResponseObject;
 import com.ving.ecommerce.orders.entity.UserCart;
@@ -14,15 +15,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ving.ecommerce.orders.ServerConfiguration.BASE_USER_SERVICE;
+
 @Service
 public class CartServiceImpl implements CartService {
-
-    String BASE_PRODUCT_SERVICE = "http://localhost:8080";
-    String BASE_MERCHANT_SERVICE = "http://localhost:8081";
-    String BASE_ORDER_SERVICE = "http://localhost:8082";
-    String BASE_USER_SERVICE = "http://localhost:8083";
-    String BASE_EMAIL_SERVICE = "http://localhost:8084";
-    String BASE_SEARCH_SERVICE = "http://localhost:8085";
 
     @Autowired
     private UserCartRepository userCartRepository;

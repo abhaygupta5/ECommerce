@@ -1,9 +1,7 @@
 package com.ving.ecommerce.orders.service.impl;
 
-import com.ving.ecommerce.orders.entity.CartItem;
-import com.ving.ecommerce.orders.entity.OrderItem;
-import com.ving.ecommerce.orders.entity.ResponseObject;
-import com.ving.ecommerce.orders.entity.UserOrder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ving.ecommerce.orders.entity.*;
 import com.ving.ecommerce.orders.model.MerchantDTO;
 import com.ving.ecommerce.orders.model.ProductDTO;
 import com.ving.ecommerce.orders.model.UserCartDTO;
@@ -11,12 +9,19 @@ import com.ving.ecommerce.orders.model.UserDTO;
 import com.ving.ecommerce.orders.repository.UserCartRepository;
 import com.ving.ecommerce.orders.repository.UserOrderRepository;
 import com.ving.ecommerce.orders.service.CartService;
+import com.ving.ecommerce.orders.service.EmailService;
 import com.ving.ecommerce.orders.service.OrderService;
+import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.ving.ecommerce.orders.ServerConfiguration.BASE_MERCHANT_SERVICE;
+import static com.ving.ecommerce.orders.ServerConfiguration.BASE_PRODUCT_SERVICE;
+import static com.ving.ecommerce.orders.ServerConfiguration.BASE_USER_SERVICE;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -28,14 +33,10 @@ public class OrderServiceImpl implements OrderService {
     UserCartRepository userCartRepository;
 
     @Autowired
-    CartService cartService;
+    EmailService emailService;
 
-    String BASE_PRODUCT_SERVICE = "http://localhost:8080";
-    String BASE_MERCHANT_SERVICE = "http://localhost:8081";
-    String BASE_ORDER_SERVICE = "http://localhost:8082";
-    String BASE_USER_SERVICE = "http://localhost:8083";
-    String BASE_EMAIL_SERVICE = "http://localhost:8084";
-    String BASE_SEARCH_SERVICE = "http://localhost:8085";
+    @Autowired
+    CartService cartService;
 
     @Override
     public ResponseObject placeOrder(String token) {
@@ -48,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
             return userCartResponse;
         }
 
+
         UserCartDTO userCartDTO = (UserCartDTO) userCartResponse.getData();
 
         // check if items in cart
@@ -56,6 +58,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         UserOrder newUserOrder = new UserOrder();
+        newUserOrder.setOrderItemList(new ArrayList<OrderItem>());
+
         List<CartItem> cartItemList = userCartDTO.getCartItems();
 
         // for each cart item check if in stock
@@ -79,30 +83,50 @@ public class OrderServiceImpl implements OrderService {
         // stock is met now
 
         // place order for product
+        ObjectMapper mapper = new ObjectMapper();
         // API GET /users?userId={}
         String getUserUri = BASE_USER_SERVICE+"/users?userId=" + userCartDTO.getUserId();
         RestTemplate userRestTemplate = new RestTemplate();
         ResponseObject userResponseObject = userRestTemplate.getForObject(getUserUri, ResponseObject.class);
-        UserDTO userDTO = (UserDTO) userResponseObject.getData();
+        UserDTO userDTO = mapper.convertValue(userResponseObject.getData(), UserDTO.class);
 
         newUserOrder.setUserId(userDTO.getUserId());
         newUserOrder.setUserDTO(userDTO);
 
+        String orderItemString = "ORDER SUMMARY\n"
+                                +"-------------\n";
+        Double totalCost = 0.0;
+
         // now for each cart item get productDTO and merchantDTO
+        // generate the order summary also
         for(CartItem cartItem: cartItemList) {
             // get productDTO
             // API GET /getProduct?productId={productId}
             String productUri = BASE_PRODUCT_SERVICE+"/getProduct?productId=" + cartItem.getProductId();
             RestTemplate productRestTemplate = new RestTemplate();
             ResponseObject productResponseObject = productRestTemplate.getForObject(productUri, ResponseObject.class);
-            ProductDTO productDTO = (ProductDTO) productResponseObject.getData();
+            ProductDTO productDTO = mapper.convertValue(productResponseObject.getData(), ProductDTO.class);
+
+            double productPrice = productDTO.getPrice();
+            int productQuantity = cartItem.getQuantity();
+            orderItemString = orderItemString
+                    + "Product Brand: "+ productDTO.getBrand() + "\n"
+                    + "Product Name: " + productDTO.getProductName() + "\n"
+                    + "Price: " + Double.toString(productPrice) + "\n"
+                    + "Quantity: " + productQuantity + "\n";
+
+            totalCost += productPrice * productQuantity;
 
             // get merchantDTO
             // API GET /merchants/{merchantId}
-            String merchantUri = BASE_MERCHANT_SERVICE+"/merchants?" +cartItem.getMerchantId();
+            String merchantUri = BASE_MERCHANT_SERVICE+"/merchants/" +cartItem.getMerchantId();
             RestTemplate merchantRestTemplate = new RestTemplate();
             ResponseObject merchantResponseObject = merchantRestTemplate.getForObject(merchantUri, ResponseObject.class);
-            MerchantDTO merchantDTO = (MerchantDTO) merchantResponseObject.getData();
+            MerchantDTO merchantDTO = mapper.convertValue(merchantResponseObject.getData(), MerchantDTO.class);
+
+            orderItemString = orderItemString
+                    + "Merchant Name: " + merchantDTO.getMerchantName() + "\n"
+                    + "-----" + "\n";
 
             // get the stock
             // API GET /getStockOfProduct?productId={}&mechantId={}
@@ -114,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
 
             // update the stock - decrement by order quantity
             // API PUT /updateStock/{merchantId}?productId={}&stock={}
-            int updatedStock = stock - cartItem.getQuantity();
+            int updatedStock = stock - productQuantity;
             String updateStockUri = BASE_MERCHANT_SERVICE+"/updateStock/"+cartItem.getMerchantId()+"?productId="
                     +cartItem.getProductId()+"&stock=" + updatedStock;
             RestTemplate updateStockRestTemplate = new RestTemplate();
@@ -126,8 +150,19 @@ public class OrderServiceImpl implements OrderService {
             newUserOrder.getOrderItemList().add(orderItem);
         }
 
+        orderItemString = orderItemString
+                + "Total Cost: " + Double.toString(totalCost) + "\n";
+
         // save the order in the database
         userOrderRepository.save(newUserOrder);
+
+        emailService.sendSimpleMessage(userDTO.getUserEmail(),
+                "Your order has been placed successfully!",
+                orderItemString);
+
+        // clear cart of the user
+        UserCart usercart = userCartRepository.findOne(userCartDTO.getUserId());
+        userCartRepository.delete(usercart);
 
         // return cartDTO
         return new ResponseObject(userCartDTO, true);
