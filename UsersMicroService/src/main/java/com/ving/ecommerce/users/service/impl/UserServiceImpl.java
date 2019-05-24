@@ -168,12 +168,21 @@ public class UserServiceImpl implements UserService {
         } else {
                 return new ResponseObject("token not found in database", false);
         }
-
-
     }
 
-    /*@Override
-    public boolean isTokenValid(String token) {
+    @Override
+    public ResponseObject getUserIdByToken(String token) {
+        UserToken userToken = userTokenRepository.findByToken(token);
+
+        if(userToken != null) {
+            return new ResponseObject(userToken.getToken(), true);
+        } else {
+            return new ResponseObject("token not found in database", false);
+        }
+    }
+
+    @Override
+    public ResponseObject isTokenValid(String token) {
         UserToken userToken = userTokenRepository.findByToken(token);
 
         if(token != null) {
@@ -181,7 +190,7 @@ public class UserServiceImpl implements UserService {
         } else {
             return new ResponseObject(false, true);
         }
-    }*/
+    }
 
 
     // Helper functions

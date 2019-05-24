@@ -50,6 +50,6 @@ public class UserController {
 
     @GetMapping("/users/{token}")
     public ResponseObject getUserIdByToken(@PathVariable String token) {
-        return null;
+        return userService.getUserIdByToken(token);
     }
 }

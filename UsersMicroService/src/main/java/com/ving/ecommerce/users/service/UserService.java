@@ -14,13 +14,13 @@ public interface UserService {
      * Creates a user in the database
      * returns boolean indicating success
      */
-    public ResponseObject createUser(UserDTO userDTO);
+    ResponseObject createUser(UserDTO userDTO);
 
     /**
      * Updates the details of a user in the database
      * return boolean indicating success
      */
-    public ResponseObject updateUser(UserDTO userDTO);
+    ResponseObject updateUser(UserDTO userDTO);
 
     /**
      * Returns token for user after authenticating
@@ -33,6 +33,13 @@ public interface UserService {
     ResponseObject logoutUser(String token);
 
     /**
-     * Returns whether a given token is valid
-    public ResponseObject isTokenValid(String token);*/
+     * Returns boolean in data field, whether the given token is valid
+     */
+    ResponseObject isTokenValid(String token);
+
+
+    /**
+     * Return the userId in tha data field of the response object
+     */
+    ResponseObject getUserIdByToken(String token);
 }
