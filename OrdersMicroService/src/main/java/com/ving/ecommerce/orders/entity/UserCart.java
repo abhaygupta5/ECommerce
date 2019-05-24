@@ -1,5 +1,7 @@
-package com.ving.ecommerce.orders.model;
+package com.ving.ecommerce.orders.entity;
 
+import com.ving.ecommerce.orders.entity.CartItem;
+import com.ving.ecommerce.orders.model.UserDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,7 +11,8 @@ import java.util.List;
 public class UserCart {
 
     @Id
-    private int userId;
+    int userId;
+    UserDTO userDTO;
     List<CartItem> cartItems;
 
     public UserCart() {

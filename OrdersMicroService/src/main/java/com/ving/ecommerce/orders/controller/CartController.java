@@ -1,6 +1,6 @@
 package com.ving.ecommerce.orders.controller;
 
-import com.ving.ecommerce.orders.model.ResponseObject;
+import com.ving.ecommerce.orders.entity.ResponseObject;
 import com.ving.ecommerce.orders.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
 package com.ving.ecommerce.orders.service.impl;
 
-import com.ving.ecommerce.orders.model.CartItem;
-import com.ving.ecommerce.orders.model.ResponseObject;
-import com.ving.ecommerce.orders.model.UserCart;
+import com.ving.ecommerce.orders.entity.CartItem;
+import com.ving.ecommerce.orders.entity.ResponseObject;
+import com.ving.ecommerce.orders.entity.UserCart;
 import com.ving.ecommerce.orders.model.UserCartDTO;
 import com.ving.ecommerce.orders.repository.UserCartRepository;
 import com.ving.ecommerce.orders.service.CartService;

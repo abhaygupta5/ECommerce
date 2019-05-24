@@ -1,6 +1,6 @@
 package com.ving.ecommerce.orders.repository;
 
-import com.ving.ecommerce.orders.model.UserCart;
+import com.ving.ecommerce.orders.entity.UserCart;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 

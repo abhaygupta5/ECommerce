@@ -1,4 +1,4 @@
-package com.ving.ecommerce.orders.model;
+package com.ving.ecommerce.orders.entity;
 
 public class ResponseObject {
     private Object data;

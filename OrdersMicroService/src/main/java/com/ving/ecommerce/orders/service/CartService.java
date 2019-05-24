@@ -1,6 +1,6 @@
 package com.ving.ecommerce.orders.service;
 
-import com.ving.ecommerce.orders.model.ResponseObject;
+import com.ving.ecommerce.orders.entity.ResponseObject;
 
 public interface CartService {
 

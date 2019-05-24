@@ -1,5 +1,7 @@
 package com.ving.ecommerce.orders.model;
 
+import com.ving.ecommerce.orders.entity.CartItem;
+
 import java.util.List;
 
 public class UserCartDTO {
