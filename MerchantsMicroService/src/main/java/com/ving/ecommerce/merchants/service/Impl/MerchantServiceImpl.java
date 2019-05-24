@@ -18,11 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonJsonParser;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -59,7 +54,7 @@ public class MerchantServiceImpl implements MerchantService {
             return new ResponseObject(merchantDTO, true);
         }
         //returns Merchant DTO
-        return new ResponseObject(null, false);
+        return new ResponseObject("Could not find merchant", false);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class MerchantServiceImpl implements MerchantService {
         if(productMerchant !=null){
             return new ResponseObject(productMerchant.getProductPrice(),true);
         }
-        return new ResponseObject(null,false);
+        return new ResponseObject("Product or Merchant does not exist",false);
     }
 
     @Override
@@ -79,7 +74,7 @@ public class MerchantServiceImpl implements MerchantService {
         if(productMerchant !=null){
             return new ResponseObject(productMerchant.getStock(),true);
         }
-        return new ResponseObject(null,false);
+        return new ResponseObject("Product or Merchant does not exist",false);
     }
 
     @Override
@@ -92,7 +87,7 @@ public class MerchantServiceImpl implements MerchantService {
             ProductMerchant productMerchant = productMerchantRepository.findOne(new MerchantProductId(merchantId, productId));
             return new ResponseObject(productMerchant.getProductPrice()+":"+merchantName, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Product or Merchant does not exist", false);
     }
 
     @Override
@@ -103,7 +98,7 @@ public class MerchantServiceImpl implements MerchantService {
         if(productMerchants.size() != 0){
             return new ResponseObject(productMerchants, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Merchant does not exist", false);
     }
 
     @Override
@@ -113,7 +108,7 @@ public class MerchantServiceImpl implements MerchantService {
             double averageRating = merchantRatingRepository.getAverageMerchantRating(merchantId);
             return new ResponseObject(averageRating, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Merchant does not exist", false);
     }
 
     @Override
@@ -122,11 +117,13 @@ public class MerchantServiceImpl implements MerchantService {
         String uri = BASE_USER_SERVICE+"/users/"+token;
         RestTemplate restTemplate = new RestTemplate();
         ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        int userId = (int)responseObject.getData();
-        if(merchantRatingRepository.exists(new MerchantRatingId(merchantId, userId))){
-            return new ResponseObject(merchantRatingRepository.findOne(new MerchantRatingId(merchantId, userId)), true);
+        if(!responseObject.getOk()) {
+            int userId = (int) responseObject.getData();
+            if (merchantRatingRepository.exists(new MerchantRatingId(merchantId, userId))) {
+                return new ResponseObject(merchantRatingRepository.findOne(new MerchantRatingId(merchantId, userId)), true);
+            }
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("No Merchant rating found", false);
     }
 
     @Override
@@ -135,12 +132,15 @@ public class MerchantServiceImpl implements MerchantService {
         String uri = BASE_USER_SERVICE+"/users/"+token;
         RestTemplate restTemplate = new RestTemplate();
         ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        int userId = (int)responseObject.getData();
-        MerchantRating merchantRating = merchantRatingRepository.save(new MerchantRating(merchantId,userId,rating));
-        if(merchantRating!=null){
-            return new ResponseObject(merchantRating, true);
+        if(!responseObject.getOk()) {
+            int userId = (int) responseObject.getData();
+
+            MerchantRating merchantRating = merchantRatingRepository.save(new MerchantRating(merchantId, userId, rating));
+            if (merchantRating != null) {
+                return new ResponseObject(merchantRating, true);
+            }
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry please try again", false);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class MerchantServiceImpl implements MerchantService {
             productMerchant.setStock(stock);
             return new ResponseObject(productMerchantRepository.save(productMerchant), true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry please try again", false);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class MerchantServiceImpl implements MerchantService {
         if(productMerchant.getStock() > quantity){
             return new ResponseObject(true, true);
         }
-        return new ResponseObject(false, true);
+        return new ResponseObject("Sorry please try again", false);
     }
 
     @Scheduled(fixedDelay =1800000)
@@ -209,40 +209,15 @@ public class MerchantServiceImpl implements MerchantService {
             String finalMerchantList = String.join("|",merchant_sorted);
 
             // left to implement update of price
-//            uri = BASE_PRODUCT_SERVICE+"/updateProduct";
-//            restTemplate = new RestTemplate();
-//            restTemplate.postForEntity(uri, productDTO, ProductDTO.class);
+            uri = BASE_PRODUCT_SERVICE+"/updateProduct";
+            restTemplate = new RestTemplate();
+            restTemplate.put(uri, productDTO);
 
             topMerchantsRepository.save(new TopMerchants(productId, finalMerchantList));
         }
 
     }
 
-
-
-//    public String streamToString(InputStream inputStream) {
-//        String text = new Scanner(inputStream, "UTF-8").useDelimiter("\\Z").next();
-//        return text;
-//    }
-//
-//    public String jsonGetRequest(String urlQueryString) {
-//        String json = null;
-//        try {
-//            URL url = new URL(urlQueryString);
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//            connection.setDoOutput(true);
-//            connection.setInstanceFollowRedirects(false);
-//            connection.setRequestMethod("GET");
-//            connection.setRequestProperty("Content-Type", "application/json");
-//            connection.setRequestProperty("charset", "utf-8");
-//            connection.connect();
-//            InputStream inStream = connection.getInputStream();
-//            json = streamToString(inStream); // input stream to string
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//        return json;
-//    }
 }
 
 class MyComparator implements Comparator {

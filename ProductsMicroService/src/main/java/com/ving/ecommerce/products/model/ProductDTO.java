@@ -16,6 +16,7 @@ public class ProductDTO {
     private List<String> productImages;
     private String productName;
     private String brand;
+    private String description;
     private double price;
     private Map<String,Object> attributes;
 
@@ -83,6 +84,14 @@ public class ProductDTO {
         this.attributes = attributes;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "ProductDTO{" +
@@ -92,6 +101,7 @@ public class ProductDTO {
                 ", productImages=" + productImages +
                 ", productName='" + productName + '\'' +
                 ", brand='" + brand + '\'' +
+                ", description='" + description + '\'' +
                 ", price=" + price +
                 ", attributes=" + attributes +
                 '}';

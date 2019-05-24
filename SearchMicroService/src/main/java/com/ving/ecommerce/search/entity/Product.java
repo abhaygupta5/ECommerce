@@ -1,17 +1,12 @@
-package com.ving.ecommerce.products.entity;
+package com.ving.ecommerce.search.entity;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.springframework.data.elasticsearch.annotations.Document;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Document(collection = "Product")
+@Document(indexName = "products", type="product")
 public class Product {
     @Id
     private int productId;
@@ -23,6 +18,10 @@ public class Product {
     private String description;
     private double price;
     private Map<String, Object> attributes;
+
+    public Product(){
+
+    }
 
     public int getProductId() {
         return productId;
@@ -72,6 +71,14 @@ public class Product {
         this.brand = brand;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -88,11 +95,18 @@ public class Product {
         this.attributes = attributes;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", category='" + category + '\'' +
+                ", subCategory='" + subCategory + '\'' +
+                ", productImages=" + productImages +
+                ", productName='" + productName + '\'' +
+                ", brand='" + brand + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", attributes=" + attributes +
+                '}';
     }
 }
