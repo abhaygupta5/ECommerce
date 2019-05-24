@@ -14,6 +14,16 @@ public class MerchantRating {
     @Column(nullable = false)
     private int rating;
 
+    public MerchantRating(int merchantId, int userId, int rating) {
+        this.merchantId = merchantId;
+        this.userId = userId;
+        this.rating = rating;
+    }
+
+    public MerchantRating(){
+
+    }
+
     public int getMerchantId() {
         return merchantId;
     }

@@ -1,5 +1,11 @@
 package com.ving.ecommerce.merchants.model;
 
+import com.ving.ecommerce.merchants.entity.TopMerchantObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class TopMerchantsDTO {
     private int productId;
     private String merchantList;

@@ -7,6 +7,7 @@ import com.ving.ecommerce.products.model.ResponseObject;
 import com.ving.ecommerce.products.service.impl.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,14 @@ public class ProductController {
 
     @Autowired
     private ProductServiceImpl productService;
+
+    @GetMapping("/testingInternalApiCall")
+    ResponseObject testing(){
+        String uri = "http://localhost:8081/merchants/1";
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(uri,ResponseObject.class);
+    }
+
 
     @GetMapping("/getTopProducts")
     ResponseObject getTopProducts(){

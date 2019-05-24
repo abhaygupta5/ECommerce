@@ -1,5 +1,6 @@
 package com.ving.ecommerce.products.service.impl;
 
+import com.ving.ecommerce.products.ServerConfiguration;
 import com.ving.ecommerce.products.entity.Filter;
 import com.ving.ecommerce.products.entity.Product;
 import com.ving.ecommerce.products.entity.ProductReview;
@@ -17,14 +18,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static com.ving.ecommerce.products.ServerConfiguration.BASE_USER_SERVICE;
+
 @Service
 public class ProductServiceImpl implements ProductService {
-    String BASE_PRODUCT_SERVICE = "http://localhost:8080";
-    String BASE_MERCHANT_SERVICE = "http://localhost:8081";
-    String BASE_ORDER_SERVICE = "http://localhost:8082";
-    String BASE_USER_SERVICE = "http://localhost:8083";
-    String BASE_EMAIL_SERVICE = "http://localhost:8084";
-    String BASE_SEARCH_SERVICE = "http://localhost:8085";
 
 
     @Autowired
@@ -230,4 +227,6 @@ public class ProductServiceImpl implements ProductService {
         }
         return new ResponseObject(null, false);
     }
+
+
 }

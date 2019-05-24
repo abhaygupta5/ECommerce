@@ -1,12 +1,18 @@
 package com.ving.ecommerce.products.model;
 
-public class ResponseObject {
+
+public class ResponseObject{
     private Object data;
     private boolean ok;
 
     public ResponseObject(Object data, boolean ok) {
         this.data = data;
         this.ok = ok;
+    }
+
+    // For Deserialization
+    public ResponseObject(){
+
     }
 
     public Object getData() {

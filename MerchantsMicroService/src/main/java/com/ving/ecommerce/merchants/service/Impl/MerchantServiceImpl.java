@@ -1,10 +1,12 @@
 package com.ving.ecommerce.merchants.service.Impl;
 
-import com.ving.ecommerce.merchants.entity.Merchant;
-import com.ving.ecommerce.merchants.entity.MerchantProductId;
-import com.ving.ecommerce.merchants.entity.MerchantRatingId;
-import com.ving.ecommerce.merchants.entity.ProductMerchant;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.ving.ecommerce.merchants.entity.*;
 import com.ving.ecommerce.merchants.model.MerchantDTO;
+import com.ving.ecommerce.merchants.model.ProductDTO;
 import com.ving.ecommerce.merchants.model.ProductMerchantDTO;
 import com.ving.ecommerce.merchants.model.ResponseObject;
 import com.ving.ecommerce.merchants.repository.MerchantRatingRepository;
@@ -12,20 +14,32 @@ import com.ving.ecommerce.merchants.repository.MerchantRepository;
 import com.ving.ecommerce.merchants.repository.ProductMerchantRepository;
 import com.ving.ecommerce.merchants.repository.TopMerchantsRepository;
 import com.ving.ecommerce.merchants.service.MerchantService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonJsonParser;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.ving.ecommerce.merchants.ServerConfiguration.BASE_USER_SERVICE;
+import static com.ving.ecommerce.merchants.ServerConfiguration.BASE_PRODUCT_SERVICE;
+
 @Service
 public class MerchantServiceImpl implements MerchantService {
-    String BASE_PRODUCT_SERVICE = "http://localhost:8080";
-    String BASE_MERCHANT_SERVICE = "http://localhost:8081";
-    String BASE_ORDER_SERVICE = "http://localhost:8082";
-    String BASE_USER_SERVICE = "http://localhost:8083";
-    String BASE_EMAIL_SERVICE = "http://localhost:8084";
-    String BASE_SEARCH_SERVICE = "http://localhost:8085";
 
     @Autowired
     private MerchantRatingRepository merchantRatingRepository;
@@ -69,15 +83,27 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public ResponseObject getBestMerchantPriceOfProduct(int productId) {
+    public ResponseObject getBestMerchantPriceOfProductWithName(int productId) {
         //returns double
-        return null;
+        if(topMerchantsRepository.exists(productId)){
+            TopMerchants topMerchants = topMerchantsRepository.findOne(productId);
+            int merchantId = Integer.parseInt(topMerchants.getMerchantList().split(":")[0]);
+            String merchantName = topMerchants.getMerchantList().split(":")[1];
+            ProductMerchant productMerchant = productMerchantRepository.findOne(new MerchantProductId(merchantId, productId));
+            return new ResponseObject(productMerchant.getProductPrice()+":"+merchantName, true);
+        }
+        return new ResponseObject(null, false);
     }
 
     @Override
-    public ResponseObject getSortedMerchantList(int productId) {
+    public ResponseObject getMerchantList(int productId) {
         // returns ProductMerchantDTO
-        return null;
+        List<ProductMerchant> productMerchants = productMerchantRepository.findByProductIdWithCondition(productId);
+        System.out.println(productMerchants);
+        if(productMerchants.size() != 0){
+            return new ResponseObject(productMerchants, true);
+        }
+        return new ResponseObject(null, false);
     }
 
     @Override
@@ -106,11 +132,130 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public ResponseObject setMerchantRating(int merchantId, String token, int rating) {
         // returns true or false
-        return null;
+        String uri = BASE_USER_SERVICE+"/users/"+token;
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
+        int userId = (int)responseObject.getData();
+        MerchantRating merchantRating = merchantRatingRepository.save(new MerchantRating(merchantId,userId,rating));
+        if(merchantRating!=null){
+            return new ResponseObject(merchantRating, true);
+        }
+        return new ResponseObject(null, false);
+    }
+
+    @Override
+    public ResponseObject updateStock(int merchantId, int productId, int stock) {
+        ProductMerchant productMerchant = productMerchantRepository.findOne(new MerchantProductId(merchantId, productId));
+        if(productMerchant != null){
+            productMerchant.setStock(stock);
+            return new ResponseObject(productMerchantRepository.save(productMerchant), true);
+        }
+        return new ResponseObject(null, false);
+    }
+
+    @Override
+    public ResponseObject checkInStock(int merchantId, int productId, int quantity) {
+        ProductMerchant productMerchant = productMerchantRepository.findOne(new MerchantProductId(merchantId, productId));
+        if(productMerchant.getStock() > quantity){
+            return new ResponseObject(true, true);
+        }
+        return new ResponseObject(false, true);
     }
 
     @Scheduled(fixedDelay =1800000)
     public void updateTopMerchantsTable(){
-        System.out.println("Scheduler is working");
+
+        List<Integer> productList = productMerchantRepository.getAllProductIds();
+
+
+        for(int productId : productList){
+            List<TopMerchantObject> sorted_merchants = new ArrayList<>();
+            List<Integer> merchantListForProduct = productMerchantRepository.getAllMerchantsByProduct(productId);
+
+            Map<Merchant, Double> merchantScoreForProduct = new HashMap<>();
+            for(int merchantId : merchantListForProduct){
+                Merchant merchant = merchantRepository.findOne(merchantId);
+                Long numberOfProductsMerchantSelling = productMerchantRepository.countByMerchantId(merchantId);
+                int currentStockOfProduct = productMerchantRepository.getStockFromId(merchantId, productId);
+                double averageMerchantRating = (double)getAverageMerchantRating(merchantId).getData();
+                double priceOfProduct = productMerchantRepository.getPriceFromId(merchantId, productId);
+                double merchantScore = (numberOfProductsMerchantSelling + currentStockOfProduct + averageMerchantRating + priceOfProduct)/4;
+                merchantScoreForProduct.put(merchant, merchantScore);
+
+            }
+            MyComparator comp=new MyComparator(merchantScoreForProduct);
+
+            Map<Merchant,Double> sorted = new TreeMap(comp);
+            sorted.putAll(merchantScoreForProduct);
+
+            for(Merchant merchant: sorted.keySet()){
+                sorted_merchants.add(new TopMerchantObject(merchant.getMerchantId(),merchant.getMerchantName()));
+            }
+            TopMerchantObject toUpdateProduct = sorted_merchants.get(0);
+            int merchantIdToUpdate = toUpdateProduct.getMerchantId();
+            String uri = BASE_PRODUCT_SERVICE+"/getProduct?productId="+productId;
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseObject responseObject1 = restTemplate.getForObject(uri, ResponseObject.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+            ProductDTO productDTO = mapper.convertValue(responseObject1.getData(), ProductDTO.class);
+            productDTO.setPrice((double)getPriceOfProduct(productId, merchantIdToUpdate).getData());
+
+            String[] merchant_sorted = new String[1];
+            int index=0;
+            for(TopMerchantObject topMerchantObject: sorted_merchants){
+                merchant_sorted[index] = topMerchantObject.toString();
+            }
+            String finalMerchantList = String.join("|",merchant_sorted);
+
+            // left to implement update of price
+//            uri = BASE_PRODUCT_SERVICE+"/updateProduct";
+//            restTemplate = new RestTemplate();
+//            restTemplate.postForEntity(uri, productDTO, ProductDTO.class);
+
+            topMerchantsRepository.save(new TopMerchants(productId, finalMerchantList));
+        }
+
+    }
+
+
+
+//    public String streamToString(InputStream inputStream) {
+//        String text = new Scanner(inputStream, "UTF-8").useDelimiter("\\Z").next();
+//        return text;
+//    }
+//
+//    public String jsonGetRequest(String urlQueryString) {
+//        String json = null;
+//        try {
+//            URL url = new URL(urlQueryString);
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//            connection.setDoOutput(true);
+//            connection.setInstanceFollowRedirects(false);
+//            connection.setRequestMethod("GET");
+//            connection.setRequestProperty("Content-Type", "application/json");
+//            connection.setRequestProperty("charset", "utf-8");
+//            connection.connect();
+//            InputStream inStream = connection.getInputStream();
+//            json = streamToString(inStream); // input stream to string
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//        return json;
+//    }
+}
+
+class MyComparator implements Comparator {
+
+    Map map;
+
+    public MyComparator(Map map) {
+        this.map = map;
+    }
+
+    public int compare(Object o1, Object o2) {
+
+        return ((Double) map.get(o2)).compareTo((Double) map.get(o1));
+
     }
 }

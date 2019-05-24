@@ -4,6 +4,7 @@ import com.ving.ecommerce.merchants.model.ResponseObject;
 import com.ving.ecommerce.merchants.service.Impl.MerchantServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class MerchantController {
@@ -18,7 +19,6 @@ public class MerchantController {
 
     @GetMapping("/merchants/{merchantId}")
     ResponseObject getMerchant(@PathVariable int merchantId){
-        System.out.println("Coming here!!");
         return merchantService.getMerchant(merchantId);
     }
 
@@ -33,13 +33,13 @@ public class MerchantController {
     }
 
     @GetMapping("/getBestMerchantPriceOfProduct")
-    ResponseObject getBestMerchantPriceOfProduct(@RequestParam int productId){
-        return merchantService.getBestMerchantPriceOfProduct(productId);
+    ResponseObject getBestMerchantPriceOfProductWithName(@RequestParam int productId){
+        return merchantService.getBestMerchantPriceOfProductWithName(productId);
     }
 
-    @GetMapping("/merchants/")
-    ResponseObject getSortedMerchantList(@RequestParam int productId){
-        return merchantService.getSortedMerchantList(productId);
+    @GetMapping("/merchants")
+    ResponseObject getMerchantList(@RequestParam int productId){
+        return merchantService.getMerchantList(productId);
     }
 
     @GetMapping("/merchantAverageRating/{merchantId}")
@@ -56,4 +56,15 @@ public class MerchantController {
     ResponseObject setMerchantRating(@PathVariable int merchantId, @RequestParam String token, @RequestParam int rating){
         return merchantService.setMerchantRating(merchantId, token, rating);
     }
+
+    @PutMapping("/updateStock/{merchantId}")
+    ResponseObject updateStock(@PathVariable int merchantId, @RequestParam int productId, @RequestParam int stock){
+        return merchantService.updateStock(merchantId,productId, stock);
+    }
+
+    @GetMapping("/checkInStock")
+    ResponseObject checkInStock(@RequestParam int merchantId, @RequestParam int productId, @RequestParam int quantity){
+        return merchantService.checkInStock(merchantId, productId, quantity);
+    }
+
 }

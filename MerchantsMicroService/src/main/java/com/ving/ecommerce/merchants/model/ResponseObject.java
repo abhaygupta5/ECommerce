@@ -10,6 +10,10 @@ public class ResponseObject {
         this.ok = ok;
     }
 
+    public ResponseObject(){
+
+    }
+
     public Object getData() {
         return data;
     }
