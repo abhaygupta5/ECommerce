@@ -4,7 +4,7 @@
     <b-form-group id="input-group-2" label="Full Name" label-for="input-2" ><superscript style="color:red;position:absolute;top: 0px;left: 6rem;">*</superscript>
         <b-form-input
           id="input-2"
-          v-model="form.name"
+          v-model="form.userDisplayName"
           required
           placeholder="Enter name"
         ></b-form-input>
@@ -13,7 +13,7 @@
       <b-form-group id="input-group-7" label="Username" label-for="input-7"><superscript style="color:red; position:absolute;top: 82px;left: 6rem;">*</superscript>
         <b-form-input
           id="input-7"
-          v-model="form.username"
+          v-model="form.userName"
           required
           placeholder="username"
         ></b-form-input>
@@ -23,7 +23,7 @@
         <b-form-input
         type="number"
           id="input-3"
-          v-model="form.mobile"
+          v-model="form.userPhone"
           required
           placeholder="Example:1234567891"
         ></b-form-input>
@@ -33,7 +33,7 @@
         <b-form-input
         type="password"
           id="input-4"
-          v-model="form.password"
+          v-model="form.userPassword"
           required
         ></b-form-input>
         <b-form-invalid-feedback :state="validation">
@@ -44,7 +44,7 @@
       </b-form-valid-feedback>
     </b-form-group>
 
-    <b-form-group id="input-group-8" label="Confirm Password" label-for="input-8"><superscript style="color:red;position: absolute;top: 360px;left: 9.5rem;">*</superscript>
+    <!--<b-form-group id="input-group-8" label="Confirm Password" label-for="input-8"><superscript style="color:red;position: absolute;top: 360px;left: 9.5rem;">*</superscript>
         <b-form-input
         type="password"
           id="input-8"
@@ -57,17 +57,16 @@
       <b-form-valid-feedback :state="validation2">
         Looks Good.
       </b-form-valid-feedback>
-    </b-form-group>      
+    </b-form-group   -->
 
       <b-form-group
         id="input-group-1"
         label="Email address"
         label-for="input-1"
-        description="We'll never share your email with anyone else."
-      >
+        description="We'll never share your email with anyone else.">
         <b-form-input
           id="input-1"
-          v-model="form.email"
+          v-model="form.userEmail"
           type="email"
           required
           placeholder="Enter email"
@@ -79,7 +78,7 @@
     left: 7.7rem;">*</superscript>
         <b-form-input
           id="input-5"
-          v-model="form.address1"
+          v-model="form.userAddress"
           required
           placeholder="Address"
         ></b-form-input>
@@ -105,16 +104,22 @@
 <script>
 
 import UserDetails from './UserDetails'
+import { constants } from 'crypto';
 
 export default {
     name: 'SignUp',
     data() {
       return {
         form: {
-          email: '',
-          name: '',
-          password: '',
-          password2: ''
+          userId : null,
+         userDisplayName :'',
+         userPhone:{
+           type: Number
+         } ,
+         userName:'',
+         userAddress:[],
+         userEmail:'',
+         userPassword:''
         },
         show: true
       }
@@ -122,7 +127,18 @@ export default {
     methods: {
       onSubmit(evt) {
         evt.preventDefault()
+        console.log('****', this.form)
+        let add = []
+        add.push(this.form.userAddress)
+
+        Object.assign(this.form, {userAddress: add})
         alert(JSON.stringify(this.form))
+        this.fetchCreateUser(this.form)
+      },
+      fetchCreateUser(jsonObject){
+        console.log('this.', )
+        this.$store.dispatch('addToDoCreateUser', jsonObject)
+        // this.$store.dispatch('addToDoCreateUser',jsonObject)
       },
       onReset(evt) {
         evt.preventDefault()
@@ -149,13 +165,14 @@ export default {
     },
     computed: {
       validation() {
-        return this.form.password.length > 4 && this.form.password.length < 13
+        return this.form.userPassword.length > 4 && this.form.userPassword.length < 13;
       },
       validation2() {
-        return this.form.password2 === this.form.password;
+        return this.form.password2 === this.form.userPassword;
       }
     }
-  }
+  
+}
 </script>
 
 <style>

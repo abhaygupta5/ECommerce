@@ -1,13 +1,16 @@
 <template>
   
   <div>
-    <Header/>
-    <!--<SignUp/>
-  <Footer/>
+    <Header/> 
+    <SignUp/>
+  <!--<Footer/>
     
    <!-- <UserDetails/>
-    -->
-    <Cart/>
+    
+    <Cart/>-->
+    <!-- <OrderHistory/> -->
+    <!-- <CategoriesBar/> -->
+    
 <Footer/>
   </div>
 </template>
@@ -18,6 +21,7 @@ import SignUp from './components/SignUp'
 import UserDetails from './components/UserDetails'
 import Header from './components/Header'
 import Cart from './components/Cart'
+import OrderHistory from './components/OrderHistory'
 
 export default {
   name: 'app',
@@ -26,7 +30,8 @@ export default {
     SignUp,
     UserDetails,
     Header,
-    Cart
+    Cart,
+    OrderHistory
   }
 }
 </script>

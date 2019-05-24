@@ -5,9 +5,9 @@ export default {
 		axios.get(path)
 			.then(callback)
 			.catch((error) => {console.log(error)})
-    }/*
-	makePostRequest(path, callback, payload, config){
-		axios.post(path, payload, config)
+    },
+	makePostRequest(path, callback, jsonObject){
+		axios.post(path, jsonObject)
 			.then(callback)
 			.catch((error) => {console.log(error)})
 	}

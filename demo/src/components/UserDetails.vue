@@ -10,7 +10,7 @@
             <section>
                 <span>Username:</span>
                 <br>
-                <div>ronny</div>
+                <div> rythmm_sharma</div>
             </section>
             <section>
                 <span>Email:</span>
@@ -20,7 +20,7 @@
             <section>
                 <span>Mobile Number</span>
                 <button id="rcorners"><div>Edit</div></button><br>
-                <div>798899</div>
+                <div>7988995970</div>
             </section>
             <section>
                 <span>Password</span>
