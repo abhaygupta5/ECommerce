@@ -11,6 +11,7 @@ public class ProductDTO {
     private String productName;
     private String brand;
     private double price;
+    private String description;
     private Map<String,Object> attributes;
 
     public ProductDTO(){
@@ -81,6 +82,14 @@ public class ProductDTO {
         this.attributes = attributes;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "ProductDTO{" +
@@ -91,6 +100,7 @@ public class ProductDTO {
                 ", productName='" + productName + '\'' +
                 ", brand='" + brand + '\'' +
                 ", price=" + price +
+                ", description='" + description + '\'' +
                 ", attributes=" + attributes +
                 '}';
     }

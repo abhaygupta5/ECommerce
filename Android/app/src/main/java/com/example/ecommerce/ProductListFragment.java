@@ -103,19 +103,18 @@ public class ProductListFragment extends Fragment {
                 .build();
         ResponseObjectService service = retrofit.create(ResponseObjectService.class);
         for (Product product : listOfProducts){
-            for(Integer id : product.getListOfMerchants()){
-                service.getMerchantById(id).enqueue(new Callback<ResponseObject<Merchant>>() {
-                    @Override
-                    public void onResponse(Call<ResponseObject<Merchant>> call, Response<ResponseObject<Merchant>> response) {
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseObject<Merchant>> call, Throwable t) {
-
-                    }
-                });
+//            for(Integer id : product.getListOfMerchants()){
+//                service.getMerchantById(id).enqueue(new Callback<ResponseObject<Merchant>>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseObject<Merchant>> call, Response<ResponseObject<Merchant>> response) {
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponseObject<Merchant>> call, Throwable t) {
+//
+//                    }
+//                });
             }
         }
     }
-}
+

@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.ving.ecommerce.merchants.ServerConfiguration.BASE_ORDER_SERVICE;
 import static com.ving.ecommerce.merchants.ServerConfiguration.BASE_USER_SERVICE;
 import static com.ving.ecommerce.merchants.ServerConfiguration.BASE_PRODUCT_SERVICE;
 
@@ -128,16 +129,22 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public ResponseObject setMerchantRating(int merchantId, String token, int rating) {
-        // returns true or false
-        String uri = BASE_USER_SERVICE+"/users/"+token;
+        // TODO Check eligibilty for merchant rating from order service
+        String url = BASE_ORDER_SERVICE+"/isEligibleForRatingMerchant?token="+token+"&merchantId="+merchantId;
         RestTemplate restTemplate = new RestTemplate();
-        ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        if(!responseObject.getOk()) {
-            int userId = (int) responseObject.getData();
+        ResponseObject res = restTemplate.getForObject(url,ResponseObject.class);
+        if((boolean)res.getData()) {
+            // returns true or false
+            String uri = BASE_USER_SERVICE + "/users/" + token;
+            restTemplate = new RestTemplate();
+            ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
+            if (responseObject.getOk()) {
+                int userId = (int) responseObject.getData();
 
-            MerchantRating merchantRating = merchantRatingRepository.save(new MerchantRating(merchantId, userId, rating));
-            if (merchantRating != null) {
-                return new ResponseObject(merchantRating, true);
+                MerchantRating merchantRating = merchantRatingRepository.save(new MerchantRating(merchantId, userId, rating));
+                if (merchantRating != null) {
+                    return new ResponseObject(merchantRating, true);
+                }
             }
         }
         return new ResponseObject("Sorry please try again", false);
@@ -179,7 +186,12 @@ public class MerchantServiceImpl implements MerchantService {
                 int currentStockOfProduct = productMerchantRepository.getStockFromId(merchantId, productId);
                 double averageMerchantRating = (double)getAverageMerchantRating(merchantId).getData();
                 double priceOfProduct = productMerchantRepository.getPriceFromId(merchantId, productId);
-                double merchantScore = (numberOfProductsMerchantSelling + currentStockOfProduct + averageMerchantRating + priceOfProduct)/4;
+
+                String url = BASE_ORDER_SERVICE+"/orderCount/"+merchantId;
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseObject res = restTemplate.getForObject(url, ResponseObject.class);
+                int orderCount = (int)res.getData();
+                double merchantScore = (numberOfProductsMerchantSelling + currentStockOfProduct + averageMerchantRating + priceOfProduct + orderCount)/5;
                 merchantScoreForProduct.put(merchant, merchantScore);
 
             }

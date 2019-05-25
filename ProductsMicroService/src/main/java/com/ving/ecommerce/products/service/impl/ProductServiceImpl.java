@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static com.ving.ecommerce.products.ServerConfiguration.BASE_ORDER_SERVICE;
 import static com.ving.ecommerce.products.ServerConfiguration.BASE_SEARCH_SERVICE;
 import static com.ving.ecommerce.products.ServerConfiguration.BASE_USER_SERVICE;
 
@@ -37,8 +38,8 @@ public class ProductServiceImpl implements ProductService {
         long total = productRepository.count();
         ArrayList<Integer> numbers = new ArrayList<>();
         //Generates 10 Random Numbers in the range 1 - total
-        if(total>10) {
-            for (int i = 0; i < 10; ) {
+        if(total>8) {
+            for (int i = 0; i < 8; ) {
                 int number = (int) (Math.random() * total + 1);
                 if (numbers.contains(number)) {
                     continue;
@@ -58,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseObject getCategoryProducts(String category) {
         List<Product> products = productRepository.findByCategory(category);
-        if(products != null){
+        if(!products.isEmpty()){
             return new ResponseObject(products, true);
         }
         return new ResponseObject("No category products found", false);
@@ -67,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseObject getSubCategoryProducts(String category, String subcategory) {
         List<Product> products = productRepository.findByCategoryAndSubCategory(category, subcategory);
-        if(products != null){
+        if(!products.isEmpty()){
             return new ResponseObject(products, true);
         }
         return new ResponseObject("No sub category products found", false);
@@ -146,18 +147,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseObject setProductReview(int productId, String token, String review, int rating) {
-        String uri = BASE_USER_SERVICE+"/users/"+token;
+        //TODO Check for eligibility for review from order service
+        String url = BASE_ORDER_SERVICE+"/isEligibleForReviewProduct?token="+token+"&productId="+productId;
         RestTemplate restTemplate = new RestTemplate();
-        ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        if(!responseObject.getOk()) {
-            int userId = (int) responseObject.getData();
-            uri = BASE_USER_SERVICE + "/users?userId=" + userId;
-            responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-            Map<String, String> data = (HashMap<String, String>) responseObject.getData();
-            String username = data.get("userDisplayName");
-            ProductReview productReview = productReviewRepository.save(new ProductReview(productId, userId, username, rating, review));
-            if (productReview != null) {
-                return new ResponseObject(true, true);
+        ResponseObject res = restTemplate.getForObject(url,ResponseObject.class);
+        if((boolean)res.getData()) {
+            String uri = BASE_USER_SERVICE + "/users/" + token;
+            restTemplate = new RestTemplate();
+            ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
+            if (responseObject.getOk()) {
+                int userId = (int) responseObject.getData();
+                uri = BASE_USER_SERVICE + "/users?userId=" + userId;
+                responseObject = restTemplate.getForObject(uri, ResponseObject.class);
+                Map<String, String> data = (HashMap<String, String>) responseObject.getData();
+                String username = data.get("userDisplayName");
+                ProductReview productReview = productReviewRepository.save(new ProductReview(productId, userId, username, rating, review));
+                if (productReview != null) {
+                    return new ResponseObject(true, true);
+                }
             }
         }
         return new ResponseObject("Sorry please try again later", false);
@@ -182,7 +189,8 @@ public class ProductServiceImpl implements ProductService {
     public ResponseObject createProduct(ProductDTO productDTO) {
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
-        if(productRepository.save(product) !=null){
+        if(!productRepository.exists(product.getProductId())){
+            productRepository.save(product);
             String uri = BASE_SEARCH_SERVICE+"/search/createProduct";
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.postForObject(uri, productDTO, ProductDTO.class);

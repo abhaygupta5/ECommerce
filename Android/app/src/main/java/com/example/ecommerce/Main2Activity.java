@@ -50,6 +50,8 @@ public class Main2Activity extends AppCompatActivity
     private ImageView TopPrdduct3;
     private ImageView TopPrdduct4;
 
+    private Intent navIntent;
+
     private ImageView book;
     private ImageView luggage;
     private ImageView fashion;
@@ -125,6 +127,15 @@ public class Main2Activity extends AppCompatActivity
         } else if (id == R.id.nav_my_orders) {
 
         }
+        else if (id == R.id.nav_login) {
+            navIntent = new Intent(this, LoginActivity.class);
+            startActivity(navIntent);
+        }
+        else if (id == R.id.nav_signup) {
+            navIntent = new Intent(this, SignupActivity.class);
+            startActivity(navIntent);
+        }
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

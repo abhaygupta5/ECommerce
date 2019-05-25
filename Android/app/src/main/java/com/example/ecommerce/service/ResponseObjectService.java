@@ -1,6 +1,7 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.model.Merchant;
+import com.example.ecommerce.model.MerchantProduct;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.ResponseObject;
 
@@ -19,7 +20,7 @@ public interface ResponseObjectService{
     Call<ResponseObject<Product>> getProductByCategory(@Path("category") String category);
 
     @GET("/merchants/")
-    Call<ResponseObject<Merchant>> getMerchantById(@Query("productId") int productId);
+    Call<ResponseObject<MerchantProduct>> getMerchantById(@Query("productId") int productId);
 
     @GET("/getBestMerchantPriceOfProduct")
     Call<ResponseObject<Merchant>> getBestMerchantPrice(@Query("productId") int productId);
