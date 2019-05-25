@@ -5,7 +5,7 @@ import com.ving.ecommerce.users.repository.UserAddressRepository;
 import com.ving.ecommerce.users.repository.UserRepository;
 import com.ving.ecommerce.users.repository.UserTokenRepository;
 import com.ving.ecommerce.users.service.UserService;
-import com.ving.ecommerce.users.utilities.HashGenerator;
+import com.ving.ecommerce.users.utilities.TokenGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -134,7 +134,8 @@ public class UserServiceImpl implements UserService {
                 if (matchedUser.getUserPassword().equals(password)) {
 
                     // generate token for the user
-                    String token = HashGenerator.getSHA(Integer.toString(matchedUser.getUserId()) + salt);
+                    TokenGenerator tokenGenerator = new TokenGenerator();
+                    String token = tokenGenerator.getNewToken();
 
                     //store token in db
                     UserToken newUserToken = new UserToken(matchedUser.getUserId(), token);
