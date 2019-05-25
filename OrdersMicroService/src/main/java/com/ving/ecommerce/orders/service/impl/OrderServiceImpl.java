@@ -11,6 +11,7 @@ import com.ving.ecommerce.orders.repository.UserOrderRepository;
 import com.ving.ecommerce.orders.service.CartService;
 import com.ving.ecommerce.orders.service.EmailService;
 import com.ving.ecommerce.orders.service.OrderService;
+import com.ving.ecommerce.orders.utilities.OrderIdGenerator;
 import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
     CartService cartService;
 
     @Override
-    public ResponseObject placeOrder(String token) {
+    public ResponseObject placeOrder(String token, String orderAddress) {
 
         // use userId to get cart
         ResponseObject userCartResponse = cartService.getUserCart(token);
@@ -56,10 +57,6 @@ public class OrderServiceImpl implements OrderService {
         if(userCartDTO == null) {
             return new ResponseObject("no items in cart", false);
         }
-
-        UserOrder newUserOrder = new UserOrder();
-        newUserOrder.setOrderItemList(new ArrayList<OrderItem>());
-
         List<CartItem> cartItemList = userCartDTO.getCartItems();
 
         // for each cart item check if in stock
@@ -84,28 +81,36 @@ public class OrderServiceImpl implements OrderService {
 
         // place order for product
         ObjectMapper mapper = new ObjectMapper();
+        ResponseObject responseObject = new ResponseObject();
+        RestTemplate restTemplate = new RestTemplate();
         // API GET /users?userId={}
         String getUserUri = BASE_USER_SERVICE+"/users?userId=" + userCartDTO.getUserId();
-        RestTemplate userRestTemplate = new RestTemplate();
-        ResponseObject userResponseObject = userRestTemplate.getForObject(getUserUri, ResponseObject.class);
-        UserDTO userDTO = mapper.convertValue(userResponseObject.getData(), UserDTO.class);
+        responseObject = restTemplate.getForObject(getUserUri, ResponseObject.class);
+        UserDTO userDTO = mapper.convertValue(responseObject.getData(), UserDTO.class);
 
-        newUserOrder.setUserId(userDTO.getUserId());
-        newUserOrder.setUserDTO(userDTO);
 
+        // create new order summary
         String orderItemString = "ORDER SUMMARY\n"
-                                +"-------------\n";
+                +"-------------\n";
         Double totalCost = 0.0;
 
         // now for each cart item get productDTO and merchantDTO
         // generate the order summary also
         for(CartItem cartItem: cartItemList) {
+
+            // create a new Order
+            UserOrder newUserOrder = new UserOrder();
+            newUserOrder.setUserId(userDTO.getUserId());
+            newUserOrder.setUserDTO(userDTO);
+            OrderIdGenerator orderIdGenerator = new OrderIdGenerator();
+            newUserOrder.setOrderId(orderIdGenerator.getNewOrderId());
+            newUserOrder.setOrderAddress(orderAddress);
+
             // get productDTO
             // API GET /getProduct?productId={productId}
             String productUri = BASE_PRODUCT_SERVICE+"/getProduct?productId=" + cartItem.getProductId();
-            RestTemplate productRestTemplate = new RestTemplate();
-            ResponseObject productResponseObject = productRestTemplate.getForObject(productUri, ResponseObject.class);
-            ProductDTO productDTO = mapper.convertValue(productResponseObject.getData(), ProductDTO.class);
+            responseObject = restTemplate.getForObject(productUri, ResponseObject.class);
+            ProductDTO productDTO = mapper.convertValue(responseObject.getData(), ProductDTO.class);
 
             double productPrice = productDTO.getPrice();
             int productQuantity = cartItem.getQuantity();
@@ -120,21 +125,15 @@ public class OrderServiceImpl implements OrderService {
             // get merchantDTO
             // API GET /merchants/{merchantId}
             String merchantUri = BASE_MERCHANT_SERVICE+"/merchants/" +cartItem.getMerchantId();
-            RestTemplate merchantRestTemplate = new RestTemplate();
-            ResponseObject merchantResponseObject = merchantRestTemplate.getForObject(merchantUri, ResponseObject.class);
-            MerchantDTO merchantDTO = mapper.convertValue(merchantResponseObject.getData(), MerchantDTO.class);
-
-            orderItemString = orderItemString
-                    + "Merchant Name: " + merchantDTO.getMerchantName() + "\n"
-                    + "-----" + "\n";
+            responseObject = restTemplate.getForObject(merchantUri, ResponseObject.class);
+            MerchantDTO merchantDTO = mapper.convertValue(responseObject.getData(), MerchantDTO.class);
 
             // get the stock
             // API GET /getStockOfProduct?productId={}&mechantId={}
             String getStockUri = BASE_MERCHANT_SERVICE+"/getStockOfProduct?productId="+cartItem.getProductId()+
                     "&merchantId="+cartItem.getMerchantId();
-            RestTemplate getStockRestTemplate = new RestTemplate();
-            ResponseObject getStockResponseObject = getStockRestTemplate.getForObject(getStockUri, ResponseObject.class);
-            int stock = (int) getStockResponseObject.getData();
+            responseObject = restTemplate.getForObject(getStockUri, ResponseObject.class);
+            int stock = (int) responseObject.getData();
 
             // update the stock - decrement by order quantity
             // API PUT /updateStock/{merchantId}?productId={}&stock={}
@@ -144,17 +143,29 @@ public class OrderServiceImpl implements OrderService {
             RestTemplate updateStockRestTemplate = new RestTemplate();
             updateStockRestTemplate.put(updateStockUri, null);
 
-            OrderItem orderItem= new OrderItem();
-            orderItem.setMerchantDTO(merchantDTO);
-            orderItem.setProductDTO(productDTO);
-            newUserOrder.getOrderItemList().add(orderItem);
+            // set the merchant for the order
+            newUserOrder.setMerchantId(merchantDTO.getMerchantId());
+            newUserOrder.setMerchantDTO(merchantDTO);
+            // set the product for the order
+            newUserOrder.setProductId(productDTO.getProductId());
+            newUserOrder.setProductDTO(productDTO);
+            // set the quantity for the order
+            newUserOrder.setQuantity(productQuantity);
+
+            // save order to repository
+            userOrderRepository.save(newUserOrder);
+
+            orderItemString = orderItemString
+                    + "Merchant Name: " + merchantDTO.getMerchantName() + "\n";
+
+            orderItemString = orderItemString +
+                    "OrderId: " + newUserOrder.getOrderId() + "\n"
+                    + "-----" + "\n";
         }
 
         orderItemString = orderItemString
+                + "Order Address: " + orderAddress + "\n"
                 + "Total Cost: " + Double.toString(totalCost) + "\n";
-
-        // save the order in the database
-        userOrderRepository.save(newUserOrder);
 
         emailService.sendSimpleMessage(userDTO.getUserEmail(),
                 "Your order has been placed successfully!",
@@ -168,7 +179,93 @@ public class OrderServiceImpl implements OrderService {
         return new ResponseObject(userCartDTO, true);
     }
 
-    // helper function
+    @Override
+    public ResponseObject getOrderCountByMerchantId(int merchantId) {
+        List<UserOrder> userOrderList = userOrderRepository.findBymerchantId(merchantId);
+
+        if(userOrderList == null) {
+            return new ResponseObject("Mongo Order Repository erroe", false);
+        } else {
+            return new ResponseObject(userOrderList.size(), true);
+        }
+    }
+
+    @Override
+    public ResponseObject getUserOrderHistory(String token) {
+        // get userid from token using the userservice
+        ResponseObject responseObject = getUserIdFromToken(token);
+
+        int userId;
+        // check if token is valid
+        if(responseObject.getOk() == false) {
+            return new ResponseObject("invalid token", false);
+        } else {
+            userId = (int)responseObject.getData();
+        }
+
+        List<UserOrder> userOrderList = userOrderRepository.findByuserId(userId);
+
+        if(userOrderList != null) {
+            //check if list is empty
+            return userOrderList.isEmpty()?
+                    new ResponseObject(null, true)
+                    : new ResponseObject(userOrderList, true);
+        } else {
+            return new ResponseObject("Mongo Order Repository error", false);
+        }
+    }
+
+    @Override
+    public ResponseObject isEligibleForReviewProduct(String token, int productId) {
+        // get userid from token using the userservice
+        ResponseObject responseObject = getUserIdFromToken(token);
+
+        int userId;
+        // check if token is valid
+        if(responseObject.getOk() == false) {
+            return new ResponseObject("invalid token", false);
+        } else {
+            userId = (int)responseObject.getData();
+        }
+
+        List<UserOrder> userOrderList = userOrderRepository.findByUserIdAndProductId(userId,  productId);
+
+        if(userOrderList != null) {
+            return userOrderList.isEmpty() ?
+                new ResponseObject(false, true) :
+                new ResponseObject(true, true);
+        } else {
+            return new ResponseObject("Mongo Order Repository error", false);
+        }
+    }
+
+    @Override
+    public ResponseObject isEligibleForRatingMerchant(String token, int merchantId) {
+        // get userid from token using the userservice
+        ResponseObject responseObject = getUserIdFromToken(token);
+
+        int userId;
+        // check if token is valid
+        if(responseObject.getOk() == false) {
+            return new ResponseObject("invalid token", false);
+        } else {
+            userId = (int)responseObject.getData();
+        }
+
+        List<UserOrder> userOrderList = userOrderRepository.findByUserIdAndMerchantId(userId,  merchantId);
+
+        if(userOrderList != null) {
+            return userOrderList.isEmpty() ?
+                    new ResponseObject(false, true) :
+                    new ResponseObject(true, true);
+        } else {
+            return new ResponseObject("Mongo Order Repository error", false);
+        }
+    }
+
+    // ****************************************************************
+    // HELPER FUNCTIONS
+    // ****************************************************************
     private ResponseObject getUserIdFromToken(String token) {
         String uri = BASE_USER_SERVICE+"/users/"+token;
         RestTemplate restTemplate = new RestTemplate();

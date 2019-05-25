@@ -172,7 +172,9 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    // helper function
+    // ****************************************************************
+    // HELPER FUNCTIONS
+    // ****************************************************************
     private ResponseObject getUserIdFromToken(String token) {
         String uri = BASE_USER_SERVICE+"/users/"+token;
         RestTemplate restTemplate = new RestTemplate();
