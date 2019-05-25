@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static com.ving.ecommerce.products.ServerConfiguration.BASE_SEARCH_SERVICE;
 import static com.ving.ecommerce.products.ServerConfiguration.BASE_USER_SERVICE;
 
 @Service
@@ -60,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
         if(products != null){
             return new ResponseObject(products, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("No category products found", false);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
         if(products != null){
             return new ResponseObject(products, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("No sub category products found", false);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
             }
             return new ResponseObject(productDTOS, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry No products found", false);
     }
 
     @Override
@@ -107,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseObject(productDTO, true);
         }
 
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry No product found", false);
     }
 
     @Override
@@ -123,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
         if(productDTOS.size() != 0){
             return new ResponseObject(productDTOS, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry No products found", false);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class ProductServiceImpl implements ProductService {
             Filter filter = filterRepository.findByCategoryAndSubCategory(category, subcategory);
             return new ResponseObject(filter.getFilters(), true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry No filters found", false);
     }
 
     @Override
@@ -140,7 +141,7 @@ public class ProductServiceImpl implements ProductService {
         if(productReviewRepository.findByProductId(productId) != null){
             return new ResponseObject(productReviewRepository.findByProductId(productId), true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry No reviews found", false);
     }
 
     @Override
@@ -148,16 +149,18 @@ public class ProductServiceImpl implements ProductService {
         String uri = BASE_USER_SERVICE+"/users/"+token;
         RestTemplate restTemplate = new RestTemplate();
         ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        int userId = (int)responseObject.getData();
-        uri = BASE_USER_SERVICE+"/users?userId="+userId;
-        responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        Map<String,String> data = (HashMap<String,String>)responseObject.getData();
-        String username = data.get("userDisplayName");
-        ProductReview productReview = productReviewRepository.save(new ProductReview(productId,userId,username,rating, review));
-        if(productReview !=null){
-            return new ResponseObject(true,true);
+        if(!responseObject.getOk()) {
+            int userId = (int) responseObject.getData();
+            uri = BASE_USER_SERVICE + "/users?userId=" + userId;
+            responseObject = restTemplate.getForObject(uri, ResponseObject.class);
+            Map<String, String> data = (HashMap<String, String>) responseObject.getData();
+            String username = data.get("userDisplayName");
+            ProductReview productReview = productReviewRepository.save(new ProductReview(productId, userId, username, rating, review));
+            if (productReview != null) {
+                return new ResponseObject(true, true);
+            }
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry please try again later", false);
     }
 
     @Override
@@ -165,12 +168,14 @@ public class ProductServiceImpl implements ProductService {
         String uri = BASE_USER_SERVICE+"/users/"+token;
         RestTemplate restTemplate = new RestTemplate();
         ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
-        int userId = (int)responseObject.getData();
-        if(productReviewRepository.findByProductIdAndUserId(productId, userId) !=null){
-            productReviewRepository.delete(productReviewRepository.findByProductIdAndUserId(productId, userId));
-            return new ResponseObject(true, true);
+        if(!responseObject.getOk()) {
+            int userId = (int) responseObject.getData();
+            if (productReviewRepository.findByProductIdAndUserId(productId, userId) != null) {
+                productReviewRepository.delete(productReviewRepository.findByProductIdAndUserId(productId, userId));
+                return new ResponseObject(true, true);
+            }
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry could not delete. Please try again later", false);
     }
 
     @Override
@@ -178,9 +183,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
         if(productRepository.save(product) !=null){
+            String uri = BASE_SEARCH_SERVICE+"/search/createProduct";
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.postForObject(uri, productDTO, ProductDTO.class);
             return new ResponseObject(productRepository.findOne(product.getProductId()),true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry try again", false);
     }
 
     @Override
@@ -202,9 +210,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = new Product();
         BeanUtils.copyProperties(productDTO, product);
         if(productRepository.exists(productDTO.getProductId())){
+            String uri = BASE_SEARCH_SERVICE+"/search/updateProduct";
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.put(uri, productDTO);
             return new ResponseObject(productRepository.save(product),true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry try again later", false);
     }
 
     @Override
@@ -212,9 +223,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findOne(productId);
         if(product !=null){
             productRepository.delete(productId);
+            String uri = BASE_SEARCH_SERVICE+"/search/deleteProduct?productId="+productId;
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.delete(uri);
             return new ResponseObject(true,true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry try again later", false);
     }
 
     @Override
@@ -225,7 +239,7 @@ public class ProductServiceImpl implements ProductService {
         if(result != null){
             return new ResponseObject(result, true);
         }
-        return new ResponseObject(null, false);
+        return new ResponseObject("Sorry try again later", false);
     }
 
 
