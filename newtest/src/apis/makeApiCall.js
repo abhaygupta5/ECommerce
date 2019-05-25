@@ -2,6 +2,7 @@ import axios from 'axios'
 
 export default {
 	makeGetRequest (path, callback){
+		alert("in get request");
 		axios.get(path)
 			.then(callback)
 			.catch((error) => {console.log(error)})
@@ -12,10 +13,14 @@ export default {
 			.catch((error) => {console.log(error)})
 	},
 	makePostLoginRequest(path, callback){
-		alert("api called")
 		axios.post(path)
 			.then(callback)
 			.catch((error) =>{console.log(error)})
+	},
+	makeDeleteRequest(path,callback) {
+		axios.delete(path)
+			.then(callback)
+			.catch((error) => {console.log(error) })
 	}
 	/*
 	makePutRequest(path, callback, fail, payload, config){

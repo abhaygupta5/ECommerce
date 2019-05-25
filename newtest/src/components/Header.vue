@@ -10,10 +10,11 @@
     <li><a href="#work"><b-form-input v-model="text" placeholder="Search Products" style="width:700px;height:50px;position:relative; bottom:5px"></b-form-input></a></li>
     <li> <b-button variant="outline-primary" style="height:50px; width:100px; position:relative; top:15px ;font-size:20px"><b>Search</b></b-button></li>
     <li><a href="#careers"><i class="fas fa-shopping-cart fa-2x"></i></a></li>
-     <li><b-button v-b-modal.modal-1 variant="outline-primary" style="height:50px; width:180px ;position:relative; top:15px ; font-size:20px"><b>Login & Signup</b></b-button></li>
-      <b-modal id="modal-1" >
+     <li><b-button v-if="isUserActive==false" v-b-modal.modal-1 variant="outline-primary" style="height:50px; width:180px ;position:relative; top:15px ; font-size:20px"><b>Login & Signup</b></b-button></li>
+     <li><b-button v-if="isUserActive" @click="goToUserDetails" v-b-modal.modal-1 variant="success" style="height:50px; width:180px ;position:relative; top:15px ; font-size:20px"><b>Profile</b></b-button></li>
+      <b-modal id="modal-1" v-if="isUserActive==false" >
 
-        <div class="form1" v-if="isLogin" >
+        <div class="form1" v-if="isLogin && isUserActive==false" >
            <b-form @submit="onSubmit"  v-if="show">
           <b-form-group id="input-group-11" label="Username" label-for="input-11">
         <b-form-input
@@ -431,6 +432,8 @@ a {
 
 import UserDetails from './UserDetails'
 import { constants } from 'crypto';
+import { mapGetters, mapActions } from 'vuex';
+import { setTimeout } from 'timers';
 
   export default {
     
@@ -482,6 +485,10 @@ import { constants } from 'crypto';
       onSubmit(evt) {
         evt.preventDefault()
         this.fetchLoginData();
+        setTimeout(() => {
+          this.$router.go()
+        }
+        ,1000)
       },
       fetchCreateUser(jsonObject){
         //console.log(this.$store);
@@ -555,6 +562,9 @@ import { constants } from 'crypto';
         this.$nextTick(() => {
           this.show = true
         })
+      },
+      goToUserDetails(){
+        this.$router.push({name: 'userDetails'})
       }
      },
      computed: {
@@ -565,6 +575,9 @@ import { constants } from 'crypto';
       validation2: function() {
         console.log("world")
         return this.pass1 === this.pass2;
+      },
+      isUserActive: function(){
+        return localStorage.getItem("token")!=null
       }
     }
   }
