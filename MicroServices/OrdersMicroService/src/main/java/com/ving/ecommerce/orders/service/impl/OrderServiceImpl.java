@@ -90,7 +90,8 @@ public class OrderServiceImpl implements OrderService {
 
 
         // create new order summary
-        String orderItemString = "ORDER SUMMARY\n"
+        String orderItemString = "Hello " + userDTO.getUserName() + "! Here's your order summary.\n"
+                + "ORDER SUMMARY\n"
                 +"-------------\n";
         Double totalCost = 0.0;
 

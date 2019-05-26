@@ -23,7 +23,7 @@ public class CartController {
     }
 
     @DeleteMapping("/cart/{token}")
-    public ResponseObject addToUserCart(@PathVariable String token, @RequestParam int product,
+    public ResponseObject deleteCartItem(@PathVariable String token, @RequestParam int product,
                                         @RequestParam int merchant) {
         return cartService.deleteCartItem(token, product, merchant);
     }
@@ -31,5 +31,10 @@ public class CartController {
     @GetMapping("/cart/{token}")
     public ResponseObject getUserCart(@PathVariable String token) {
         return cartService.getUserCart(token);
+    }
+
+    @GetMapping("/detailsCart/{token}")
+    public ResponseObject getDetailsUserCart(@PathVariable String token) {
+        return cartService.getDetailsUserCart(token);
     }
 }
