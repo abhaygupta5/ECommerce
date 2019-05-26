@@ -20,12 +20,14 @@ public class UserOrder {
     private ProductDTO productDTO;
     private int merchantId;
     private MerchantDTO merchantDTO;
+    double productPrice;
+    double totalPrice;
     int quantity;
 
     public UserOrder() {
     }
 
-    public UserOrder(String orderId, int userId, UserDTO userDTO, String orderAddress, int productId, ProductDTO productDTO, int merchantId, MerchantDTO merchantDTO, int quantity) {
+    public UserOrder(String orderId, int userId, UserDTO userDTO, String orderAddress, int productId, ProductDTO productDTO, int merchantId, MerchantDTO merchantDTO, double productPrice, double totalPrice, int quantity) {
         this.orderId = orderId;
         this.userId = userId;
         this.userDTO = userDTO;
@@ -34,6 +36,8 @@ public class UserOrder {
         this.productDTO = productDTO;
         this.merchantId = merchantId;
         this.merchantDTO = merchantDTO;
+        this.productPrice = productPrice;
+        this.totalPrice = totalPrice;
         this.quantity = quantity;
     }
 
@@ -101,6 +105,22 @@ public class UserOrder {
         this.merchantDTO = merchantDTO;
     }
 
+    public double getProductPrice() {
+        return productPrice;
+    }
+
+    public void setProductPrice(double productPrice) {
+        this.productPrice = productPrice;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -120,6 +140,8 @@ public class UserOrder {
                 ", productDTO=" + productDTO +
                 ", merchantId=" + merchantId +
                 ", merchantDTO=" + merchantDTO +
+                ", productPrice=" + productPrice +
+                ", totalPrice=" + totalPrice +
                 ", quantity=" + quantity +
                 '}';
     }

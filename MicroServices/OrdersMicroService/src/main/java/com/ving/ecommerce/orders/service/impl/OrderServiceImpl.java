@@ -132,7 +132,13 @@ public class OrderServiceImpl implements OrderService {
             responseObject = restTemplate.getForObject(productUri, ResponseObject.class);
             ProductDTO productDTO = mapper.convertValue(responseObject.getData(), ProductDTO.class);
 
-            double productPrice = productDTO.getPrice();
+            // get product price
+            // GET /getPriceOfProduct?productId={}&merchantId={}
+            String productPriceUri = BASE_PRODUCT_SERVICE+"/getPriceOfProduct?productId="
+                    + cartItem.getProductId() + "&merchantId=" + cartItem.getMerchantId();
+            responseObject = restTemplate.getForObject(productPriceUri, ResponseObject.class);
+            double productPrice = (double) responseObject.getData();
+
             int productQuantity = cartItem.getQuantity();
             orderItemString = orderItemString
                     + "Product Brand: "+ productDTO.getBrand() + "\n"
@@ -140,7 +146,13 @@ public class OrderServiceImpl implements OrderService {
                     + "Price: " + Double.toString(productPrice) + "\n"
                     + "Quantity: " + productQuantity + "\n";
 
+            // add cost for summary string
             totalCost += productPrice * productQuantity;
+
+            // calculate total cost for order
+            double totalOrderPrice = productPrice * productQuantity;
+            newUserOrder.setTotalPrice(totalOrderPrice);
+            newUserOrder.setProductPrice(productPrice);
 
             // get merchantDTO
             // API GET /merchants/{merchantId}
