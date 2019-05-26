@@ -18,22 +18,17 @@ public class UserController {
         return "UserMicorService: Pong";
     }
 
-    @GetMapping("/users")
-    public ResponseObject getUserByUserId(@RequestParam Integer userId) {
-        return userService.getUserByUserId(userId);
-    }
-
-    @PostMapping(value = "/users", produces = "application/json", consumes = "application/json")
+    @PostMapping(value = "/users", consumes = "application/json")
     public ResponseObject createUser(@RequestBody UserDTO userDTO) {
         return userService.createUser(userDTO);
     }
 
-    @PutMapping(value = "/users", produces = "application/json", consumes = "application/json")
+    @PutMapping(value = "/users", consumes = "application/json")
     public ResponseObject updateUser(@RequestBody UserDTO userDTO) {
         return userService.updateUser(userDTO);
     }
 
-    @PostMapping(value = "/signup", produces = "application/json", consumes = "application/json")
+    @PostMapping(value = "/signup", consumes = "application/json")
     public ResponseObject signupUser(@RequestBody UserDTO userDTO) {
         return this.createUser(userDTO);
     }
@@ -43,7 +38,7 @@ public class UserController {
         return userService.loginUser(username, password);
     }
 
-    @DeleteMapping("logout")
+    @DeleteMapping("/logout")
     public ResponseObject logoutUser(@RequestParam String token) {
         return userService.logoutUser(token);
     }
@@ -51,5 +46,15 @@ public class UserController {
     @GetMapping("/users/{token}")
     public ResponseObject getUserIdByToken(@PathVariable String token) {
         return userService.getUserIdByToken(token);
+    }
+
+    @GetMapping("/user")
+    public ResponseObject getUserByToken(@RequestParam String token) {
+        return userService.getUserByToken(token);
+    }
+
+    @GetMapping("/users")
+    public ResponseObject getUserByUserId(@RequestParam Integer userId) {
+        return userService.getUserByUserId(userId);
     }
 }

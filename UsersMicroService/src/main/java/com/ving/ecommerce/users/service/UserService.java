@@ -42,4 +42,9 @@ public interface UserService {
      * Return the userId in tha data field of the response object
      */
     ResponseObject getUserIdByToken(String token);
+
+    /**
+     * Return the userDTO in tha data field of the response object
+     */
+    ResponseObject getUserByToken(String token);
 }
