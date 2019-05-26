@@ -1,17 +1,14 @@
 package com.example.ecommerce;
 
-import android.content.Intent;
-import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.ecommerce.model.Merchant;
 import com.example.ecommerce.model.MerchantProduct;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.ResponseObject;
@@ -21,7 +18,6 @@ import com.example.ecommerce.service.BestPriceService;
 import com.example.ecommerce.service.ResponseObjectService;
 import com.example.ecommerce.service.ResponseProductService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +40,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private TextView productName;
     private LinearLayout linearLayout;
     private LinearLayout linearLayout2;
+    private LinearLayout linearLayout3;
 
     private String productId;
     private Product product;
@@ -144,7 +141,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                     Log.d("merchantdetail ", response.body().getData().get(0)
                             + " size " + response.body().getData().size());
                     listOfMerchants = response.body().getData();
-
                     addMerchantInfo();
 
                 }
@@ -174,16 +170,35 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        linearLayout.removeAllViews();
+        super.onStop();
+    }
+
     public void addMerchantInfo(){
         for(MerchantProduct merchant: listOfMerchants){
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASEURLMERCHANT)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(new OkHttpClient())
-                    .build();
+
+            TextView price = new TextView(ProductDetailActivity.this);
+            price.setText("price : " + String.valueOf(merchant.getProductPrice()));
+            TextView merchantName = new TextView(ProductDetailActivity.this);
+            merchantName.setText("Merchant Name : " + merchant.getMerchantName());
+            TextView rating = new TextView(ProductDetailActivity.this);
+            rating.setText("rating : " + merchant.getAverageRating());
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            linearLayout3 = new LinearLayout(ProductDetailActivity.this);
+            linearLayout3.setLayoutParams(params);
+            linearLayout3.setOrientation(LinearLayout.VERTICAL);
+            linearLayout3.setDividerDrawable(getDrawable(R.drawable.divider_drawable));
+            linearLayout3.setShowDividers(LinearLayout.SHOW_DIVIDER_END);
+            linearLayout3.setElevation(12);
+            linearLayout3.addView(price);
+            linearLayout3.addView(merchantName);
+            linearLayout3.addView(rating);
+            linearLayout2.addView(linearLayout3);
         }
     }
-
-
 }

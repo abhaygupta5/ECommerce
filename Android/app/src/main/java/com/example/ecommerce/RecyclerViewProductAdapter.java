@@ -54,7 +54,6 @@ public class RecyclerViewProductAdapter extends RecyclerView.Adapter<RecyclerVie
             productImage = itemView.findViewById(R.id.productImage);
             price = itemView.findViewById(R.id.price);
             productName = itemView.findViewById(R.id.productName);
-            merchantName = itemView.findViewById(R.id.merchantName);
         }
 
         public void bind(Product item){

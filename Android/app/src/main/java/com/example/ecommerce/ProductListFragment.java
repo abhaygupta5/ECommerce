@@ -31,14 +31,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ProductListFragment extends Fragment {
 
-    private final String BASEURL = "http://172.16.20.64:8080";
 
     private static String productCategory;
+    private static String searchProducts;
 
     final List<Product> listOfProducts = new ArrayList<>();
 
-    public static ProductListFragment newProductListFragment(String pc){
+    public static ProductListFragment newProductListFragment(String pc, String search){
         productCategory = pc;
+        searchProducts = search;
         return new ProductListFragment();
     }
 
@@ -61,60 +62,68 @@ public class ProductListFragment extends Fragment {
 
         recyclerView.setAdapter(recyclerViewAdapter);
 
+        if(productCategory != null){
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(ServerConfiguration.BASE_PRODUCT_SERVICE)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(new OkHttpClient())
+                    .build();
+            ResponseObjectService service = retrofit.create(ResponseObjectService.class);
+            service.getProductByCategory(productCategory).enqueue(new Callback<ResponseObject<Product>>() {
+                @Override
+                public void onResponse(Call<ResponseObject<Product>> call, Response<ResponseObject<Product>> response) {
+                    if(response.body()!=null && response.body().isOk()){
+                        Log.d("product ", response.body().getData()
+                                + " size " + response.body().getData().size());
+                        listOfProducts.clear();
+                        listOfProducts.addAll(response.body().getData());
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                        Log.d("asdfjd", listOfProducts.size() + "");
+                    }
+                    else {
+                        Log.d("product ", "not ok");
+                    }
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(new OkHttpClient())
-                .build();
-
-        ResponseObjectService service = retrofit.create(ResponseObjectService.class);
-        service.getProductByCategory(productCategory).enqueue(new Callback<ResponseObject<Product>>() {
-            @Override
-            public void onResponse(Call<ResponseObject<Product>> call, Response<ResponseObject<Product>> response) {
-                if(response.body()!=null && response.body().isOk()){
-                    Log.d("product ", response.body().getData()
-                            + " size " + response.body().getData().size());
-                    listOfProducts.clear();
-                    listOfProducts.addAll(response.body().getData());
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                    Log.d("asdfjd", listOfProducts.size() + "");
                 }
-                else {
-                    Log.d("product ", "not ok");
+
+                @Override
+                public void onFailure(Call<ResponseObject<Product>> call, Throwable t) {
+                    Log.d("product", t.getMessage());
+                }
+            });
+        }
+
+        else if (searchProducts != null){
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(ServerConfiguration.BASE_SEARCH_SERVICE)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(new OkHttpClient())
+                    .build();
+            ResponseObjectService service = retrofit.create(ResponseObjectService.class);
+            service.search(searchProducts).enqueue(new Callback<ResponseObject<Product>>() {
+                @Override
+                public void onResponse(Call<ResponseObject<Product>> call, Response<ResponseObject<Product>> response) {
+                    if(response.body()!=null && response.body().isOk()){
+                        Log.d("product ", response.body().getData()
+                                + " size " + response.body().getData().size());
+                        listOfProducts.clear();
+                        listOfProducts.addAll(response.body().getData());
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                        Log.d("asdfjd", listOfProducts.size() + "");
+                    }
+                    else {
+                        Log.d("product ", "not ok");
+                    }
+
                 }
 
-            }
-
-            @Override
-            public void onFailure(Call<ResponseObject<Product>> call, Throwable t) {
-                Log.d("product", t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<ResponseObject<Product>> call, Throwable t) {
+                    Log.d("product", t.getMessage());
+                }
+            });
+        }
 
         super.onViewCreated(view, savedInstanceState);
     }
-
-    public void getMerchants(){
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASEURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(new OkHttpClient())
-                .build();
-        ResponseObjectService service = retrofit.create(ResponseObjectService.class);
-        for (Product product : listOfProducts){
-//            for(Integer id : product.getListOfMerchants()){
-//                service.getMerchantById(id).enqueue(new Callback<ResponseObject<Merchant>>() {
-//                    @Override
-//                    public void onResponse(Call<ResponseObject<Merchant>> call, Response<ResponseObject<Merchant>> response) {
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponseObject<Merchant>> call, Throwable t) {
-//
-//                    }
-//                });
-            }
-        }
-    }
-
+}

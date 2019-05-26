@@ -9,8 +9,6 @@
     tools:context=".Main2Activity"
     tools:showIn="@layout/app_bar_main2">
 
-
-
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
         android:layout_width="match_parent"
@@ -30,7 +28,7 @@
                 android:layout_height="48dp"
                 android:layout_margin="8dp"
                 android:layout_weight="1"
-                android:contentDescription="book"
+                android:contentDescription="books"
                 android:onClick="getByCategory"
                 android:padding="8dp"
                 android:src="@drawable/ic_baseline_library_books_24px" />
@@ -52,7 +50,7 @@
                 android:layout_height="48dp"
                 android:layout_margin="8dp"
                 android:layout_weight="1"
-                android:contentDescription="storage"
+                android:contentDescription="luggage"
                 android:onClick="getByCategory"
                 android:padding="8dp"
                 android:src="@drawable/ic_storage" />
@@ -74,7 +72,7 @@
                 android:layout_height="48dp"
                 android:layout_margin="8dp"
                 android:layout_weight="1"
-                android:contentDescription="careProducts"
+                android:contentDescription="beauty"
                 android:onClick="getByCategory"
                 android:padding="8dp"
                 android:src="@drawable/ic_bathroom" />
@@ -130,32 +128,32 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.29000002" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content">-->
 
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="100dp"
-                    android:layout_height="80dp"
-                    android:layout_margin="8dp"
-                    android:src="@drawable/ic_baseline_shopping_cart_24px" />
+                <!--<ImageView-->
+                    <!--android:id="@+id/imageView3"-->
+                    <!--android:layout_width="100dp"-->
+                    <!--android:layout_height="80dp"-->
+                    <!--android:layout_margin="8dp"-->
+                    <!--android:src="@drawable/ic_baseline_shopping_cart_24px" />-->
 
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="100dp"
-                    android:layout_height="80dp"
-                    android:layout_margin="8dp"
-                    android:src="@drawable/ic_baseline_shopping_cart_24px" />
+                <!--<ImageView-->
+                    <!--android:id="@+id/imageView"-->
+                    <!--android:layout_width="100dp"-->
+                    <!--android:layout_height="80dp"-->
+                    <!--android:layout_margin="8dp"-->
+                    <!--android:src="@drawable/ic_baseline_shopping_cart_24px" />-->
 
 
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="100dp"
-                    android:layout_height="80dp"
-                    android:layout_margin="8dp"
-                    android:src="@drawable/ic_baseline_shopping_cart_24px" />
-            </LinearLayout>
+                <!--<ImageView-->
+                    <!--android:id="@+id/imageView2"-->
+                    <!--android:layout_width="100dp"-->
+                    <!--android:layout_height="80dp"-->
+                    <!--android:layout_margin="8dp"-->
+                    <!--android:src="@drawable/ic_baseline_shopping_cart_24px" />-->
+            <!--</LinearLayout>-->
 
             <TextView
                 android:id="@+id/textView"
@@ -163,9 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Deals of the Day"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="@+id/imageView"
-                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+                android:textSize="24sp" />
 
 
             <GridLayout

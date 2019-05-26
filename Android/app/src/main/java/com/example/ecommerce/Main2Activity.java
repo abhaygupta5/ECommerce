@@ -1,6 +1,8 @@
 package com.example.ecommerce;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.GravityCompat;
@@ -12,11 +14,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.model.ResponseObject;
+import com.example.ecommerce.model.ResponseObject1;
 import com.example.ecommerce.service.ResponseObjectService;
 import com.google.gson.Gson;
 
@@ -45,19 +50,20 @@ public class Main2Activity extends AppCompatActivity
 
     private ImageView[] TopProduct;
 
-    private ImageView TopPrdduct1;
-    private ImageView TopPrdduct2;
-    private ImageView TopPrdduct3;
-    private ImageView TopPrdduct4;
-
     private Intent navIntent;
 
-    private ImageView book;
-    private ImageView luggage;
-    private ImageView fashion;
-    private ImageView care;
-    private ImageView electronics;
+    private TextView search;
 
+//    private ImageView book;
+//    private ImageView luggage;
+//    private ImageView fashion;
+//    private ImageView care;
+//    private ImageView electronics;
+
+    private MenuItem logOut;
+    private MenuItem logIn;
+    private MenuItem signUp;
+    private String token;
 
 
     @Override
@@ -74,6 +80,10 @@ public class Main2Activity extends AppCompatActivity
 //        toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+        logOut = findViewById(R.id.nav_logout);
+        logIn = findViewById(R.id.nav_login);
+        signUp = findViewById(R.id.nav_signup);
+
     }
 
     @Override
@@ -87,11 +97,24 @@ public class Main2Activity extends AppCompatActivity
         TopProduct[2] = findViewById(R.id.TopProduct3);
         TopProduct[3] = findViewById(R.id.TopProduct4);
 
-        book = findViewById(R.id.book);
-        luggage = findViewById(R.id.storage);
-        fashion = findViewById(R.id.fashion);
-        care = findViewById(R.id.careProducts);
-        electronics = findViewById(R.id.electronics);
+        SharedPreferences sharedPreferences = Main2Activity.this.getSharedPreferences(
+                getString(R.string.preference_file), Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN", null);
+
+        if(token == null){
+            logOut.setVisible(false);
+        }
+        else{
+            signUp.setVisible(false);
+            logIn.setVisible(false);
+        }
+
+
+//        book = findViewById(R.id.book);
+//        luggage = findViewById(R.id.storage);
+//        fashion = findViewById(R.id.fashion);
+//        care = findViewById(R.id.careProducts);
+//        electronics = findViewById(R.id.electronics);
 
         getTopProducts();
     }
@@ -112,6 +135,7 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
         if (id == R.id.nav_books) {
@@ -130,10 +154,49 @@ public class Main2Activity extends AppCompatActivity
         else if (id == R.id.nav_login) {
             navIntent = new Intent(this, LoginActivity.class);
             startActivity(navIntent);
+
         }
         else if (id == R.id.nav_signup) {
             navIntent = new Intent(this, SignupActivity.class);
             startActivity(navIntent);
+        }
+        else if(id == R.id.nav_logout){
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(ServerConfiguration.BASE_USER_SERVICE)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(new OkHttpClient())
+                    .build();
+
+            ResponseObjectService service = retrofit.create(ResponseObjectService.class);
+            service.logout(token).enqueue(new Callback<ResponseObject1>() {
+                @Override
+                public void onResponse(Call<ResponseObject1> call, Response<ResponseObject1> response) {
+                    if(response.body()!=null && response.body().isOk()){
+                        Toast.makeText(Main2Activity.this, "Logout Successful",
+                                Toast.LENGTH_SHORT).show();
+                        SharedPreferences sharedPreferences = Main2Activity.this.getSharedPreferences(
+                                getString(R.string.preference_file), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.remove("TOKEN");
+                    }
+                    else {
+                        SharedPreferences sharedPreferences = Main2Activity.this.getSharedPreferences(
+                                getString(R.string.preference_file), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.remove("TOKEN");
+                        Toast.makeText(Main2Activity.this, "not valid token",
+                                Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(Main2Activity.this, LoginActivity.class);
+                        startActivity(intent);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseObject1> call, Throwable t) {
+
+                }
+            });
+
         }
 
 
@@ -200,4 +263,8 @@ public class Main2Activity extends AppCompatActivity
         startActivity(intent);
     }
 
+    public void taketosearch(View view){
+        Intent intent = new Intent(Main2Activity.this, SearchAcitivity.class);
+        startActivity(intent);
+    }
 }

@@ -37,15 +37,18 @@
         <item
             android:id="@+id/nav_my_cart"
             android:title="@string/menu_my_cart" />
-        <item
-            android:id="@+id/nav_my_account"
-            android:title="@string/menu_my_account" />
+        <!--<item-->
+            <!--android:id="@+id/nav_my_account"-->
+            <!--android:title="@string/menu_my_account" />-->
         <item
             android:id="@+id/nav_login"
             android:title="Login" />
         <item
             android:id="@+id/nav_signup"
             android:title="Signup" />
+        <item
+            android:id="@+id/nav_logout"
+            android:title="Logout"/>
     </group>
 
 </menu>
