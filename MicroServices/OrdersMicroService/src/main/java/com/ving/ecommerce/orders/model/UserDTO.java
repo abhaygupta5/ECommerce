@@ -7,7 +7,7 @@ public class UserDTO {
     private int userId;
     private String userName;
     private String userDisplayName;
-    private ArrayList<String> userAddress;
+    private ArrayList<String> userAddressList;
     private String userEmail;
     private long userPhone;
     private String userPassword;
@@ -36,12 +36,12 @@ public class UserDTO {
         this.userDisplayName = userDisplayName;
     }
 
-    public ArrayList<String> getUserAddress() {
-        return userAddress;
+    public ArrayList<String> getUserAddressList() {
+        return userAddressList;
     }
 
-    public void setUserAddress(ArrayList<String> userAddress) {
-        this.userAddress = userAddress;
+    public void setUserAddressList(ArrayList<String> userAddressList) {
+        this.userAddressList = userAddressList;
     }
 
     public String getUserEmail() {
@@ -74,7 +74,7 @@ public class UserDTO {
                 "userId=" + userId +
                 ", userName='" + userName + '\'' +
                 ", userDisplayName='" + userDisplayName + '\'' +
-                ", userAddress=" + userAddress +
+                ", userAddressList=" + userAddressList +
                 ", userEmail='" + userEmail + '\'' +
                 ", userPhone=" + userPhone +
                 ", userPassword='" + userPassword + '\'' +

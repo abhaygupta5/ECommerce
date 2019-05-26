@@ -60,18 +60,37 @@ public class OrderServiceImpl implements OrderService {
         List<CartItem> cartItemList = userCartDTO.getCartItems();
 
         // for each cart item check if in stock
-        for(CartItem c: cartItemList) {
+        for(CartItem cartItem: cartItemList) {
 
             // check validity
-            String uri = BASE_MERCHANT_SERVICE+"/checkInStock?merchantId="+c.getMerchantId()
-                    +"&productId="+c.getProductId()+"&quantity="+c.getQuantity();
+            String uri = BASE_MERCHANT_SERVICE+"/checkInStock?merchantId="+cartItem.getMerchantId()
+                    +"&productId="+cartItem.getProductId()+"&quantity="+cartItem.getQuantity();
             RestTemplate restTemplate = new RestTemplate();
             ResponseObject responseObject = restTemplate.getForObject(uri, ResponseObject.class);
 
             // check if stock is satisfied
             if(responseObject.getOk()) {
                 if(!(boolean)responseObject.getData()) {
-                    return new ResponseObject("Some product out of stock.", false);
+                    // get product name and merchant name
+
+                    // get merchantDTO
+                    // API GET /merchants/{merchantId}
+                    ObjectMapper mapper = new ObjectMapper();
+                    String merchantUri = BASE_MERCHANT_SERVICE+"/merchants/" +cartItem.getMerchantId();
+                    responseObject = restTemplate.getForObject(merchantUri, ResponseObject.class);
+                    MerchantDTO merchantDTO = mapper.convertValue(responseObject.getData(), MerchantDTO.class);
+
+                    // get productDTO
+                    // API GET /getProduct?productId={productId}
+                    String productUri = BASE_PRODUCT_SERVICE+"/getProduct?productId=" + cartItem.getProductId();
+                    responseObject = restTemplate.getForObject(productUri, ResponseObject.class);
+                    ProductDTO productDTO = mapper.convertValue(responseObject.getData(), ProductDTO.class);
+
+                    String errorString = productDTO.getProductName() + " by merchant "
+                            + merchantDTO.getMerchantName() + " does not have enough stock.";
+
+
+                    return new ResponseObject(errorString, false);
                 }
             } else {
                 return new ResponseObject("some error in merchant service, during checking stock.",false);
