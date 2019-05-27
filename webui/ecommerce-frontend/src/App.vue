@@ -1,10 +1,18 @@
 <template>
-  <div id="app" style="max-width:100%;max-height:100% ; overflow:scroll">
-   <Header/> 
-   <br/>
-   <CategoryBar/>
+  <div id="app" style="max-width:100%;max-height:100% ; overflow:scroll;margin-left:20px">
+    <b-container  class="box"style="max-width:100%;max-height:100% ; overflow:scroll">
+    <b-row>  
+   <Header/> </b-row>
+   <b-row style="margin-left:10px">
+  <CategoryBar/>
+   </b-row>
+   <b-row>
     <router-view></router-view>
+   </b-row>
+   </b-container>
    <Footer/>
+ 
+  
   </div>
 </template>
 
@@ -33,4 +41,14 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+@media (min-width: 500px) and (max-width: 600px) {
+  .box {
+      margin-left: 0 !important 
+    }
+
+    .desc:after {
+      content:" In fact, it's between 500px and 600px wide.";
+    }
+  }
 </style>

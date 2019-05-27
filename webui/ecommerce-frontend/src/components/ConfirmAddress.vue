@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="confirm" style="margin-left:450px">
        <br>
        <br>
        <br>
-      This is confirm address page. {{getUsers.userAddressList}}
+    Please Confirm your address for delievery. 
       <div v-for="(item,index) in getUsers.userAddressList" v-bind:key="index">
      <input type="radio" :value="item" name="radio" v-model="checked"><strong>&nbsp;{{item}}</strong>
       </div>
@@ -42,4 +42,10 @@ export default {
     }
 }
 </script>
+<style>
+.confirm{
+    font-family: Helevetica;
+    font-size:20px
+}
+</style>
 

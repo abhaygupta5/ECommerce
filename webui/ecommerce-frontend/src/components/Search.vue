@@ -14,7 +14,7 @@
   <div >
   <v-layout >
     <v-flex xs12 sm6 offset-sm3>
-    <el-breadcrumb-item><a href="/product"> 
+    
       <v-card style="width:365px" v-for="element in item.productImages" :key="element">
         <v-img
           class="white--text"
@@ -41,14 +41,14 @@
          <div class="row">
            <b-col cols="12" class="text-center">
               <!-- <v-card-actions class="text-center"> -->
-                 <v-btn round color="green" style="margin-left:75px; margin-top:0px">Add to Cart</v-btn>
+                 <v-btn round color="green" style="margin-left:75px; margin-top:0px" @click="goToProduct(item)">Go to Product Details</v-btn>
               <!-- </v-card-actions> -->
            </b-col>  
         </div>
         
         </center>
       </v-card>
-      </a> </el-breadcrumb-item>
+     
     </v-flex>
   </v-layout>
 </div>
@@ -114,6 +114,16 @@ export default {
   
     computed:{
       ...mapGetters(['getSearchResult'])
+    },
+    methods:{
+      goToProduct(item){
+          var productId = item.productId
+
+          console.log('Product id:', productId )
+          this.$store.dispatch('fetchProductById',productId);
+          this.$router.push('/product/'+productId);
+          this.$store.dispatch('fetchMerchants',productId);
+          }
     }
 }
 </script>

@@ -28,13 +28,13 @@
   <div style="margin:0px !important">
     <b-container class="bv-example-row">
     <b-row style="max-height: 400px">
-    <b-col cols="6"><img src="../images/img2.jpg" style="width:100%;height:400px"></b-col>
+    <b-col cols="6"><img src="../images/img2.jpg" @click="goToWomen" style="width:100%;height:400px"></b-col>
     <b-col cols="6">
       <b-row style="max-width:100% ; max-height:200px;">
-        <img src="../images/samsung.jpg" style="width:100%;height:200px; paddong-bottom:5px">
+        <img src="../images/samsung.jpg" @click="goToMobiles" style="width:100%;height:200px; paddong-bottom:5px">
       </b-row>
       <b-row style="max-width:100% ; max-height:200px">
-        <img src="../images/lakme.jpg" style="width:100%;height:200px; padding-top:10px" >
+        <img src="../images/lakme.jpg" @click="goToBeautyProducts" style="width:100%;height:200px; padding-top:10px" >
       </b-row>
     </b-col>
     
@@ -53,11 +53,13 @@
   <v-layout >
     <v-flex xs12 sm6 offset-sm3>
         
-      <v-card style="width:365px" v-for="element in item.productImages" :key="element" >
+      <v-card style="width:250px" v-for="element in item.productImages" :key="element" >
         <v-img
           class="img-fluid"
           :src="element ? element : ''"
-          height="600px"
+          height="400px"
+          width="250px"
+          style="object-fit:scale-down"
         >
           <v-container fill-height fluid>
             <v-layout fill-height>
@@ -97,11 +99,11 @@
 
 <!--Code for the Third row -->
   <div class="fourthrow" >
-    <b-container class="bv-example-row" style="margin-right:20px !important">
+    <b-container class="bv-example-row" style="margin-right:15px !important">
     <b-row style="max-height: 400px">
-    <b-col cols="6"><img src="../images/mennew.png" style="width:100%;height:400px"></b-col>
+    <b-col cols="6"><img src="../images/mennew.png" @click="goToMen" style="width:98%;height:400px"></b-col>
     <b-col cols="6">
-      <img src="../images/luggage.jpg" style="width:100%;height:400px ;margin-right:20px">
+      <img src="../images/luggage.jpg" @click="goToSuitcases" style="width:100%;height:400px ;margin-right:20px; margin-left:0px">
     </b-col>
     
   </b-row>
@@ -198,6 +200,11 @@ import { get } from 'http';
     },
     data () {
       return {
+        object1 : 
+       {
+         value1: '',
+         value2: ''
+      },
         
         productId:'',
         isOpen: false,
@@ -258,7 +265,52 @@ import { get } from 'http';
           this.$store.dispatch('fetchProductById',productId);
           this.$router.push('/product/'+productId);
           this.$store.dispatch('fetchMerchants',productId);
-          }
+          },
+          goToWomen (){
+          this.object1.value1 =  'fashion';
+        this.object1.value2 = 'women'
+
+         this.$router.push({name: 'Category'});
+        console.log('women',this.object1);
+            this.$store.dispatch('fetchCategory',this.object1);
+            //this.$store.dispatch('fetchFilters',this.object1);
+      },
+       goToMobiles (){
+        this.object1.value1 = 'electronics';
+        this.object1.value2 = 'mobile'
+
+        this.$router.push({name: 'Category'});
+        console.log('mobiles', this.object1);
+            this.$store.dispatch('fetchCategory',this.object1);
+           // this.$store.dispatch('fetchFilters',this.object1);
+      },
+      goToBeautyProducts(){
+        this.object1.value1 = 'beauty';
+        this.object1.value2 = 'menAndWomen'
+
+        this.$router.push({name: 'Category'});
+        console.log('beauty Products',this.object1);
+            this.$store.dispatch('fetchCategory',this.object1);
+          //  this.$store.dispatch('fetchFilters',this.object1);
+      },
+      goToMen (){
+          this.object1.value1 = 'fashion';
+        this.object1.value2 = 'men'
+
+       this.$router.push({name: 'Category'});
+        console.log('men',this.object1);
+            this.$store.dispatch('fetchCategory',this.object1);
+           // this.$store.dispatch('fetchFilters',this.object1);
+      },
+      goToSuitcases(){
+          this.object1.value1 = 'luggage';
+        this.object1.value2 = 'suitcase'
+
+         this.$router.push({name: 'Category'});
+        console.log('suitcases',this.object1);
+            this.$store.dispatch('fetchCategory',this.object1);
+           // this.$store.dispatch('fetchFilters',this.object1);
+      }
         
   },
   created(){

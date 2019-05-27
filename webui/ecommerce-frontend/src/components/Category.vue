@@ -4,23 +4,24 @@
     <br><br><br>
      <div>
          <b-row>
-           <b-col cols="3"><FilterComponent/></b-col>
-           <b-col cols="9"><div><div class="products-display">
+          
+           <b-col cols="12">
+             <div>
+               
+               <div class="products-display">
 <div class="row1">
            <b-container class="bv-example-row" style="max-width:100% !important">
   <b-row>
- <b-col cols="4" v-for="(item,index) in getMobile.data" v-bind:key="index">
+ <b-col cols="4" v-for="(item,index) in getCategory.data" v-bind:key="index">
   <div >
   <v-layout >
     <v-flex xs12 sm6 offset-sm3>
     
-      <v-card style="width:365px" v-for="element in item.productImages" :key="element">
+      <v-card style="width:250px" v-for="element in item.productImages" :key="element">
         <v-img
           class="white--text"
-          height="400px"
-          :src="element ? element : ''" 
-         
-        >
+          height="300px"
+          :src="element ? element : ''"  >
           <v-container fill-height fluid>
             <v-layout fill-height>
               <v-flex xs12 align-end flexbox>
@@ -40,7 +41,7 @@
          <div class="row">
            <b-col cols="12" class="text-center">
               <!-- <v-card-actions class="text-center"> -->
-                 <v-btn round color="green" style="margin-left:75px; margin-top:0px">Add to Cart</v-btn>
+                 <v-btn round color="green" style="margin-left:75px; margin-top:0px" @click="goToProduct(item)">Go To Product Details</v-btn>
               <!-- </v-card-actions> -->
            </b-col>  
         </div>
@@ -76,7 +77,7 @@ import Product from './Product.vue'
 import {mapGetters, mapActions} from 'vuex'
 
 export default {
-    name:'Mobiles',
+    name:'Category',
     components: {
    
     SortByBar,
@@ -86,11 +87,20 @@ export default {
 
   },
   created(){
-    console.log("mobiles", this.$route.params);
-     this.$store.dispatch('fetchMobiles');
+    console.log("category", this.$route.params);
   },
   computed:{
-      ...mapGetters(['getMobile'])
+      ...mapGetters(['getCategory'])
+  },
+  methods:{
+    goToProduct(item){
+          var productId = item.productId
+
+          console.log('Product id:', productId )
+          this.$store.dispatch('fetchProductById',productId);
+          this.$router.push('/product/'+productId);
+          this.$store.dispatch('fetchMerchants',productId);
+          }
   }
 }
 </script>

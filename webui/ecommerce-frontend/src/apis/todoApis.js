@@ -4,8 +4,9 @@ export default {
         var url = 'api/getTopProducts'
         makeApiCall.makeGetRequest(url,callback)
     },
-    getMobiles(callback){
-        var url= '/api/products/electronics/mobile'
+    getCategory(callback,object1){
+        var url= '/api/products/' + object1.value1+ '/'+ object1.value2
+        console.log("category url: ",url)
         makeApiCall.makeGetRequest(url,callback)
     },
     getSearch(callback,text){
@@ -26,8 +27,11 @@ export default {
         console.log('URL: ',url)
         makeApiCall.makeMerchantRequest(url,callback)
     },
-    getFilters(callback,text1,text2){
+    getFilters(callback,object1){
+/* do edit url */
         var url ='/'
+        console.log('URL FILTERS: ',url)
+        makeApiCall.makeGetRequest(url,callback)
     },
     getUserDetails(callback, userToken){
 		makeApiCall.makeGetUserRequest('/user'+'/user?token='+userToken,callback)
@@ -36,7 +40,7 @@ export default {
 		makeApiCall.makePostUserRequest('/user' +'/users',callback,jsonObject)
 	},
 	LoginUser(callback, arrayLogin){
-		alert("in todoapi "+arrayLogin)
+		
 		makeApiCall.makePostLoginRequest('/user'+'/login/?username='+arrayLogin[0]+'&password='+arrayLogin[1],callback)
 	},
 	logOutUser(callback, userToken){
@@ -71,7 +75,7 @@ export default {
     },
     checkOrderHistory(callback,token){
         console.log('inside todoapis')
-        var url ='/ordercart/order/'+ token
+        var url ='/ordercart/order/' +token;
         console.log("URL:",url)
         makeApiCall.makeGetOrderHistoryRequest(url,callback)
     }

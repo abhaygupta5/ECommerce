@@ -3,7 +3,7 @@ import todoApis from '../apis/todoApis.js'
 export default {
     state: {
         topProducts : [],
-        mobiles : [],
+        category: [],
         search :[],
         productById :[],
         merchants : [],
@@ -20,7 +20,7 @@ export default {
     getters: {
         getTopProducts : (state) => state.topProducts,
         
-        getMobile : (state) =>state.mobiles,
+        getCategory : (state) =>state.category,
 
         getSearchResult :(state) =>state.search,
 
@@ -50,8 +50,8 @@ export default {
         SET_DATA: (state,result) => {
             state.topProducts = result.data
         },
-        SET_MOBILES:(state,result) => {
-            state.mobiles = result.data
+        SET_CATEGORY:(state,result) => {
+            state.category = result.data
         },
         SET_SEARCH_DATA :(state,result) =>{
             state.search = result.data
@@ -111,10 +111,11 @@ export default {
                 context.commit('SET_DATA',result)
             },obj)
         },
-        fetchMobiles:(context) =>{
-            todoApis.getMobiles((result) => {
-              context.commit('SET_MOBILES',result)
-            })
+        fetchCategory:(context,object1) =>{
+            console.log(object1)
+            todoApis.getCategory((result) => {
+              context.commit('SET_CATEGORY',result)
+            },object1)
         },
         fetchProductById:(context,id) =>{
             console.log('id :',id);
@@ -128,10 +129,10 @@ export default {
                 context.commit('SET_MERCHANTS',result)
             },id)
         },
-        fetchFilters:(context,text1,text2) =>{
+        fetchFilters:(context,object1) =>{
             todoApis.getFilters((result) =>{
                 context.commit('SET_FILTERS',result)
-            },text1,text2)
+            },object1)
         },
         addLoginData: (context,arrayLogin) =>{
 			todoApis.LoginUser((result) =>{
