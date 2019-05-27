@@ -13,6 +13,7 @@ public class OrderController {
 
     @PostMapping("/order/{token}")
     ResponseObject placeOrder(@PathVariable String token, @RequestParam String orderAddress) {
+        System.out.println("PLACE ORDER: Token: " + token + " Address: " + orderAddress);
         return orderService.placeOrder(token, orderAddress);
     }
 
@@ -23,6 +24,7 @@ public class OrderController {
 
     @GetMapping("/order/{token}")
     ResponseObject getUserOrderHistory(@PathVariable String token) {
+        System.out.println("ORDER HISTORY: " + token);
         return orderService.getUserOrderHistory(token);
     }
 

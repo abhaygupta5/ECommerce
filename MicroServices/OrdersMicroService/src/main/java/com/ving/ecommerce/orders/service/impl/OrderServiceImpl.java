@@ -14,11 +14,13 @@ import com.ving.ecommerce.orders.service.OrderService;
 import com.ving.ecommerce.orders.utilities.OrderIdGenerator;
 import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.ving.ecommerce.orders.ServerConfiguration.BASE_MERCHANT_SERVICE;
 import static com.ving.ecommerce.orders.ServerConfiguration.BASE_PRODUCT_SERVICE;
@@ -134,10 +136,11 @@ public class OrderServiceImpl implements OrderService {
 
             // get product price
             // GET /getPriceOfProduct?productId={}&merchantId={}
-            String productPriceUri = BASE_PRODUCT_SERVICE+"/getPriceOfProduct?productId="
+            String productPriceUri = BASE_MERCHANT_SERVICE+"/getPriceOfProduct?productId="
                     + cartItem.getProductId() + "&merchantId=" + cartItem.getMerchantId();
             responseObject = restTemplate.getForObject(productPriceUri, ResponseObject.class);
             double productPrice = (double) responseObject.getData();
+            System.out.println("Price recieved: " + productPrice);
 
             int productQuantity = cartItem.getQuantity();
             orderItemString = orderItemString
@@ -206,6 +209,7 @@ public class OrderServiceImpl implements OrderService {
         // clear cart of the user
         UserCart usercart = userCartRepository.findOne(userCartDTO.getUserId());
         userCartRepository.delete(usercart);
+
 
         // return cartDTO
         return new ResponseObject(userCartDTO, true);
