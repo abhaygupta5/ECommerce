@@ -6,13 +6,16 @@ import com.ving.ecommerce.orders.model.UserDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Document
 public class UserOrder {
 
-    @Id
     private String orderId;
+    @Id
+    private String orderItemId;
     private int userId;
     private UserDTO userDTO;
     private String orderAddress;
@@ -23,12 +26,14 @@ public class UserOrder {
     double productPrice;
     double totalPrice;
     int quantity;
+    Date orderDate;
 
     public UserOrder() {
     }
 
-    public UserOrder(String orderId, int userId, UserDTO userDTO, String orderAddress, int productId, ProductDTO productDTO, int merchantId, MerchantDTO merchantDTO, double productPrice, double totalPrice, int quantity) {
+    public UserOrder(String orderId, String orderItemId, int userId, UserDTO userDTO, String orderAddress, int productId, ProductDTO productDTO, int merchantId, MerchantDTO merchantDTO, double productPrice, double totalPrice, int quantity, Date orderDate) {
         this.orderId = orderId;
+        this.orderItemId = orderItemId;
         this.userId = userId;
         this.userDTO = userDTO;
         this.orderAddress = orderAddress;
@@ -39,6 +44,7 @@ public class UserOrder {
         this.productPrice = productPrice;
         this.totalPrice = totalPrice;
         this.quantity = quantity;
+        this.orderDate = orderDate;
     }
 
     public String getOrderId() {
@@ -47,6 +53,14 @@ public class UserOrder {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public String getOrderItemId() {
+        return orderItemId;
+    }
+
+    public void setOrderItemId(String orderItemId) {
+        this.orderItemId = orderItemId;
     }
 
     public int getUserId() {
@@ -129,10 +143,19 @@ public class UserOrder {
         this.quantity = quantity;
     }
 
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
     @Override
     public String toString() {
         return "UserOrder{" +
                 "orderId='" + orderId + '\'' +
+                ", orderItemId='" + orderItemId + '\'' +
                 ", userId=" + userId +
                 ", userDTO=" + userDTO +
                 ", orderAddress='" + orderAddress + '\'' +
@@ -143,6 +166,7 @@ public class UserOrder {
                 ", productPrice=" + productPrice +
                 ", totalPrice=" + totalPrice +
                 ", quantity=" + quantity +
+                ", orderDate=" + orderDate +
                 '}';
     }
 }

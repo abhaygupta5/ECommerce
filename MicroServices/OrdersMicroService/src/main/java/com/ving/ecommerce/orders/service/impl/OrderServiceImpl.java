@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -104,6 +105,10 @@ public class OrderServiceImpl implements OrderService {
         ObjectMapper mapper = new ObjectMapper();
         ResponseObject responseObject = new ResponseObject();
         RestTemplate restTemplate = new RestTemplate();
+        Date orderDate = new Date();
+        OrderIdGenerator orderIdGenerator = new OrderIdGenerator();
+        String orderId = orderIdGenerator.getNewOrderId();
+        int orderItemNumber = 1;
         // API GET /users?userId={}
         String getUserUri = BASE_USER_SERVICE+"/users?userId=" + userCartDTO.getUserId();
         responseObject = restTemplate.getForObject(getUserUri, ResponseObject.class);
@@ -124,9 +129,11 @@ public class OrderServiceImpl implements OrderService {
             UserOrder newUserOrder = new UserOrder();
             newUserOrder.setUserId(userDTO.getUserId());
             newUserOrder.setUserDTO(userDTO);
-            OrderIdGenerator orderIdGenerator = new OrderIdGenerator();
-            newUserOrder.setOrderId(orderIdGenerator.getNewOrderId());
+            newUserOrder.setOrderId(orderId);
             newUserOrder.setOrderAddress(orderAddress);
+            newUserOrder.setOrderDate(orderDate);
+            newUserOrder.setOrderItemId(orderId + "#" + orderItemNumber);
+            orderItemNumber += 1;
 
             // get productDTO
             // API GET /getProduct?productId={productId}
@@ -187,20 +194,21 @@ public class OrderServiceImpl implements OrderService {
             // set the quantity for the order
             newUserOrder.setQuantity(productQuantity);
 
-            // save order to repository
             userOrderRepository.save(newUserOrder);
 
             orderItemString = orderItemString
                     + "Merchant Name: " + merchantDTO.getMerchantName() + "\n";
 
-            orderItemString = orderItemString +
-                    "OrderId: " + newUserOrder.getOrderId() + "\n"
+            orderItemString = orderItemString
+                    + "Order Item Id: " + newUserOrder.getOrderItemId() + "\n"
                     + "-----" + "\n";
         }
 
         orderItemString = orderItemString
+                + "OrderId: " + orderId + "\n"
                 + "Order Address: " + orderAddress + "\n"
                 + "Total Cost: " + Double.toString(totalCost) + "\n";
+
 
         emailService.sendSimpleMessage(userDTO.getUserEmail(),
                 "Your order has been placed successfully!",
