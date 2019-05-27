@@ -26,7 +26,7 @@ export default {
     //new test user signout login
 
     makeGetUserRequest (path, callback){
-		alert("in get request");
+	
 		axios.get(path)
 			.then(callback)
 			.catch((error) => {console.log(error)})
@@ -41,7 +41,7 @@ export default {
 			.then(callback)
 			.catch((error) =>{console.log(error)})
 	},
-	makeDeleteUesrRequest(path,callback) {
+	makeDeleteUserRequest(path,callback) {
 		axios.delete(path)
 			.then(callback)
 			.catch((error) => {console.log(error) })

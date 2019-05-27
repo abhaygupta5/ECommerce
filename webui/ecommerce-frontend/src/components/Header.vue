@@ -1,21 +1,32 @@
 <template>
     <div class="header">
         
-  
-  <a href="" class="logo" style="font-size:45px;font-family:Helevetica"><b>VING.com</b></a>
-  <input class="menu-btn" type="checkbox" id="menu-btn" />
-  <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
-  <ul class="menu">
+  <b-container style="max-width:100%;height:100px">
+    <b-row>
+      <b-col cols="2">
+ <a href="/" style="text-decoration:none"> <span style="font-size:45px;color:blue;font-family:Helevetica"><b>VING.com</b></span></a>
+      </b-col>
+       
+      <b-col cols="5.5">
 
-    <li><b-form-input v-model="searchtext" placeholder="Search Products" style="width:700px;height:50px;margin:20px"></b-form-input></li>
-    <li> <!--el-breadcrumb-item><a href="/category"--> <b-button @click ="goSearch" variant="outline-primary" style="height:50px; width:100px; margin-top:20px ;font-size:20px"><b>Search</b></b-button><!--/a></el-breadcrumb-item--></li>
-    <li><b-btn variant="outline-primary" @click="goToCart" style="width:100px;margin-top:20px"><i class="fas fa-shopping-cart fa-2x"></i></b-btn></li>
-     <li><b-button v-if="isUserActive==false" v-b-modal.modal-1 variant="outline-primary" style="height:50px; width:180px ;position:relative; top:15px ; font-size:20px"><b>Login & Signup</b></b-button></li>
-     <li><b-button variant="outline-primary" v-if="isUserActive" @click="goToUserDetails" v-b-modal.modal-1  style="height:50px; width:180px ;position:relative; top:15px ; font-size:20px"><b>Profile</b></b-button></li>
+
+    <b-form-input v-model="searchtext" placeholder="Search Products" style="width:600px;height:50px;margin:20px"></b-form-input></b-col>
+    <b-col cols="0.5">
+     <b-button @click ="goSearch" variant="outline-primary" style="height:50px; width:100px; margin-top:20px ;font-size:20px"><b>Search</b></b-button></b-col>
+
+    <b-col cols ="1">
+    <b-btn variant="outline-primary" @click="goToCart" style="width:100px;height:50px;margin-top:20px"><i class="fas fa-shopping-cart fa-2x"></i></b-btn></b-col>
+
+    <b-col cols ="1">
+   <b-button v-if="isUserActive==false " v-b-modal.modal-1 variant="outline-primary" style="height:50px; width:180px ;margin-top:20px ; font-size:20px"><b>Login & Signup</b></b-button>
+    <b-button variant="outline-primary" v-if="isUserActive" @click="goToUserDetails" style="height:50px; width:180px ;margin-top:20px ; font-size:20px"><b>Profile</b></b-button></b-col>
+      <b-col cols="1"></b-col>
+     </b-row>
+    
+  </b-container>
+
       <b-modal id="modal-1" v-if="!userActive" >
-        <div class="form2" v-if="!isLogin && isSignUp">
-            Thank you for Signing in.
-          </div>
+        
 
         <div class="form1" v-if="isLogin && isUserActive==false" >
            <b-form @submit="onSubmit"  v-if="show">
@@ -46,25 +57,25 @@
 
     <div class="profile" v-if="isSignUp">
  <b-form  @reset="onReset" v-if="show">
-      <b-form-group id="input-group-2" label="Full Name" label-for="input-2" ><superscript style="color:red;position:absolute;top: 0px;left: 6rem;">*</superscript>
+      <b-form-group id="input-group-2" label="Full Name" label-for="input-2" >
         <b-form-input
           id="input-2"
-          v-model="name1"
+          v-model="name2"
           required
           placeholder="Enter name"
         ></b-form-input>
       </b-form-group>
 
-      <b-form-group id="input-group-7" label="Username" label-for="input-7"><superscript style="color:red; position:absolute;top: 82px;left: 6rem;">*</superscript>
+      <b-form-group id="input-group-7" label="Username" label-for="input-7">
         <b-form-input
           id="input-7"
-          v-model="name2"
+          v-model="name1"
           required
           placeholder="username"
         ></b-form-input>
       </b-form-group>
     
-    <b-form-group id="input-group-3" label="Mobile Number" label-for="input-3"><superscript style="color:red;position: absolute;top: 167px;left: 8.2rem;">*</superscript>
+    <b-form-group id="input-group-3" label="Mobile Number" label-for="input-3">
         <b-form-input
         type="number"
           id="input-3"
@@ -74,7 +85,7 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-form-group id="input-group-4" label="Password" label-for="input-4"><superscript style="color:red;position: absolute;top: 250px;left: 5.7rem;">*</superscript>
+      <b-form-group id="input-group-4" label="Password" label-for="input-4">
         <b-form-input
         type="password"
           id="input-4"
@@ -89,7 +100,7 @@
       </b-form-valid-feedback>
     </b-form-group>
 
-    <b-form-group id="input-group-8" label="Confirm Password" label-for="input-8"><superscript style="color:red;position: absolute;top: 360px;left: 9.5rem;">*</superscript>
+    <b-form-group id="input-group-8" label="Confirm Password" label-for="input-8">
         <b-form-input
         type="password"
           id="input-8"
@@ -119,9 +130,7 @@
         ></b-form-input>
       </b-form-group>
 
-    <b-form-group id="input-group-5" label="Address 1" label-for="input-5"><superscript style="color:red;position: absolute;
-    top: 471px;
-    left: 7.7rem;">*</superscript>
+    <b-form-group id="input-group-5" label="Address 1" label-for="input-5">
         <b-form-input
           id="input-5"
           v-model="address1"
@@ -130,8 +139,7 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-form-group id="input-group-6" label="Address 2" label-for="input-6"><superscript style="color:red;
-    position: absolute;top: 578px;left: 5.7rem;">*</superscript>
+      <b-form-group id="input-group-6" label="Address 2" label-for="input-6">
         <b-form-input
           id="input-6"
           v-model="address2"
@@ -160,7 +168,7 @@
   </b-modal>
     
   
-  </ul>
+
 
 </div>
 </template>
@@ -527,10 +535,13 @@ import { setTimeout } from 'timers';
       onSubmitSignUp(evt) {
         this.enableLogin();
         evt.preventDefault()
-        alert(JSON.stringify(this.DataSendingObject))
-        this.setDataSendingObject()
-        alert(JSON.stringify(this.DataSendingObject))
-        this.fetchCreateUser(this.DataSendingObject)
+       
+        
+  //    if(validation2())
+    this.setDataSendingObject()
+       this.fetchCreateUser(this.DataSendingObject)
+  //    else
+    //  {  alert("Passwords not matching")}
       },
       setDataSendingObject(){
         this.DataSendingObject.userId=null,

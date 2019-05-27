@@ -1,13 +1,13 @@
 <template>
 <div class="filter">
     <br><br>
-            <strong><h2>&nbsp;Filters:</h2></strong>
-            <br/>
+            <strong><h2>Filters:</h2></strong>
+           <br>
             <div class="filter1" v-for="(item,index) in filters " v-bind:key="index">
-                <strong><p>&nbsp;{{item.key}}</p></strong>
-                <template v-for="element in item.Values">
-                    <li :key="element" type="none"> <p>&nbsp;<input type="radio" name="filters" value="some">&nbsp;{{element}}</p> </li>
-                </template>
+                <strong>{{item.key}}:</strong>
+                <div v-for="element in item.Values" v-bind:key="element">
+                    <li type="none"> <input type="radio" name="filters" value="some" style="display:inline-block">{{element}} </li>
+                </div>
                 
                 
            
@@ -38,14 +38,15 @@ export default {
 </script>
 <style>
 .filter{
-    border-right: 2px solid gray;
-    margin-left: 40px;
+   
+    margin-left: 10px;
     font-family: Helvetica;
-    font-size: x-large;
+    font-size: 20px;
 
 }
 .filter1{
    font-family: Helvetica; 
+   font-size: 15px
 }
 .filter2{
     font-family: Helvetica;

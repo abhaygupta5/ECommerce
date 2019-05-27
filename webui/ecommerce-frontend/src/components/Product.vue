@@ -4,13 +4,13 @@
         
          <b-row><b><h3 id="prod-name" > {{getProductById.data.productName}}</h3></b></b-row>
             <b-row style="height:600px">
-           <b-col cols="4">
+           <b-col cols="5">
              
               <div class="image" v-for="(element,index) in getProductById.data.productImages" v-bind:key="index">
           <img :src="element ? element : ''" class="image" style="height:400px;width:300px">
               </div>
        </b-col>
-   <b-col cols="8">
+   <b-col cols="7">
      <div class="product-details">
         <div class="product-name">
        
@@ -27,8 +27,8 @@
                 
             
             </div>
-            <br/><b>&nbsp;<b-button variant="primary" @click="addToCart">Add to cart</b-button></b>
-             <br/><b>&nbsp;<b-button variant="primary" @click="goToCart">Go to cart</b-button></b>
+            <br/><b><b-button variant="primary" @click="addToCart" style="height:50px; width:150px; margin-top:20px ;font-size:20px">Add to Cart</b-button></b>
+             <br/><b><b-button variant="primary" @click="goToCart" style="height:50px; width:120px; margin-top:20px ;font-size:20px">Go to cart</b-button></b>
   </b-col>
 </b-row>
         </div>

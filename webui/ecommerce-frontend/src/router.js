@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Search from './components/Search.vue'
 import Product from './components/Product.vue'
-import Mobiles from './components/mobiles.vue'
+import Category from './components/Category.vue'
 import Home from './components/Home.vue'
 import UserDetails from './components/UserDetails.vue'
 import Cart from './components/Cart.vue'
@@ -29,9 +29,9 @@ const router =new Router({
             component: Product
         },
         {
-            name: 'Mobiles',
-            path: '/electronics/mobiles',
-            component: Mobiles
+            name: 'Category',
+            path: '/subcategory',
+            component: Category
         },
         {
             name: 'UserDetails',

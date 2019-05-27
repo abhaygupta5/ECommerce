@@ -69,21 +69,53 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public ResponseObject searchResults(String query) {
+//        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+//                .withQuery(matchQuery("category", query))
+//                .build();
+
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(matchQuery("category", query))
+                .withQuery(matchPhraseQuery("category", query)
+                        .operator(AND)
+                        .fuzziness(Fuzziness.TWO)
+                        .prefixLength(2))
                 .build();
+
+//        SearchQuery searchQuery1 = new NativeSearchQueryBuilder()
+//                .withQuery(matchQuery("subCategory", query))
+//                .build();
+
         SearchQuery searchQuery1 = new NativeSearchQueryBuilder()
-                .withQuery(matchQuery("subCategory", query))
+                .withQuery(matchPhraseQuery("subCategory", query)
+                        .operator(AND)
+                        .fuzziness(Fuzziness.TWO)
+                        .prefixLength(2))
                 .build();
+
         SearchQuery searchQuery2 = new NativeSearchQueryBuilder()
                 .withQuery(matchPhraseQuery("description", query)
                         .slop(1)
                         .operator(AND)
-                        .fuzziness(Fuzziness.ONE)
-                        .prefixLength(3))
+                        .fuzziness(Fuzziness.AUTO)
+                        .prefixLength(2))
                 .build();
+
+
+//        SearchQuery searchQuery3 = new NativeSearchQueryBuilder()
+//                .withQuery(matchQuery("brand", query))
+//                .build();
+
         SearchQuery searchQuery3 = new NativeSearchQueryBuilder()
-                .withQuery(matchQuery("brand", query))
+                .withQuery(matchPhraseQuery("brand", query)
+                        .operator(AND)
+                        .fuzziness(Fuzziness.ONE)
+                        .prefixLength(2))
+                .build();
+
+        SearchQuery searchQuery4 = new NativeSearchQueryBuilder()
+                .withQuery(matchPhraseQuery("productName", query)
+                        .operator(AND)
+                        .fuzziness(Fuzziness.ONE)
+                        .prefixLength(2))
                 .build();
 
         List<Product> result = new ArrayList<>();
@@ -93,6 +125,7 @@ public class SearchServiceImpl implements SearchService {
 
         Page<Product> search_results1 =  searchRepository.search(searchQuery1);
         List<Product> result1 = search_results1.getContent();
+
 
         if(result1.size() != 0){
             result.addAll(Collections.unmodifiableCollection(result1));
@@ -107,11 +140,18 @@ public class SearchServiceImpl implements SearchService {
 
         Page<Product> search_results3 =  searchRepository.search(searchQuery3);
         List<Product> result3 = search_results3.getContent();
+
+        Page<Product> search_results5 =  searchRepository.search(searchQuery4);
+        List<Product> result5 = search_results5.getContent();
+
         if(result3.size() != 0){
             result.addAll(Collections.unmodifiableCollection(result3));
         }
         if(result4.size() != 0){
             result.addAll(Collections.unmodifiableCollection(result4));
+        }
+        if(result5.size() != 0){
+            result.addAll(Collections.unmodifiableCollection(result5));
         }
         List<Product> list_to_send = new ArrayList<>();
         Set<String> set = new HashSet<>();
@@ -121,6 +161,12 @@ public class SearchServiceImpl implements SearchService {
                 list_to_send.add(product);
             }
         }
+
+        System.out.println(result1);
+        System.out.println(result2);
+        System.out.println(result3);
+        System.out.println(result4);
+        System.out.println(result5);
 
         if(list_to_send.size() > 0) {
             return new ResponseObject(list_to_send, true);
